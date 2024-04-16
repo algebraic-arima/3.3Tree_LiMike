@@ -102,6 +102,7 @@ namespace venillalemon {
           insert_max_adjust(kv);
           pos = list_lower_bound(kv);
         }
+
         Node &node = list[pos];
         node.insert_pair(k, v, val);
         if (node._size == degree) {
