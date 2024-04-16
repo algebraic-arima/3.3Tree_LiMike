@@ -6,7 +6,7 @@
 using std::cin;
 
 int main() {
-  BPTree<int, int, 6, 2> bp("fn");
+  venillalemon::BPTree<int, int, 6, 2> bp("fn");
   int s;
   int n;
   cin >> n;
