@@ -100,7 +100,7 @@ namespace venillalemon {
           error("Key-value pair not found");
         }
         node._key[i] = new_kv;
-        if (i == 0 && node._par != 0) {
+        if (i == node._size - 1 && node._par != 0) {
           subs(node._par, old_kv, new_kv);
         }
       }
@@ -219,7 +219,7 @@ namespace venillalemon {
         list[r]._size += list[l]._size;
         list[l]._size = 0;
         free_pos.push_back(l);
-        if(list[par]._size < min_size) {
+        if (list[par]._size < min_size) {
           l = prev_sp_sibling(par), r = next_sp_sibling(par);
           if (l != 0) {
             if (list[l]._size > min_size) borrow_from_left(l, par);
@@ -261,7 +261,7 @@ namespace venillalemon {
         }
         list[r]._size -= bor_num;
         list[l]._size += bor_num;
-        list[par].modify_pair(list[l]._key[list[l]._size - bor_num - 1], list[r]._key[bor_num]);
+        list[par].modify_pair(list[l]._key[list[l]._size - bor_num - 1], list[l]._key[list[l]._size - 1]);
       }
 
     public:
@@ -363,20 +363,21 @@ namespace venillalemon {
           error("Key-value pair not found");
         }
         Node &node = list[pos];
-        if (kv == node._key[node._size - 1]) {
-          if (node._size < min_size) {
-            size_t l = prev_sp_sibling(pos), r = next_sp_sibling(pos);
-            if (l != 0) {
-              if (list[l]._size > min_size) borrow_from_left(l, pos);
-              else merge(l, pos);
-            } else if (r != 0) {
-              if (list[r]._size > min_size) borrow_from_right(pos, r);
-              else merge(pos, r);
-            }
-          } else subs(node._par, node._key[node._size - 1], node._key[node._size - 2]);
-        }
+        if (kv == node._key[node._size - 1])
+          subs(node._par, node._key[node._size - 1], node._key[node._size - 2]);
         node.remove_pair(k, v);
+        if (node._size < min_size) {
+          size_t l = prev_sp_sibling(pos), r = next_sp_sibling(pos);
+          if (l != 0) {
+            if (list[l]._size > min_size) borrow_from_left(l, pos);
+            else merge(l, pos);
+          } else if (r != 0) {
+            if (list[r]._size > min_size) borrow_from_right(pos, r);
+            else merge(pos, r);
+          }
+        }
       }
+
 
       /// @find
       /// returns the possible position of the key-value pair
