@@ -86,6 +86,19 @@ namespace venillalemon {
         }
         --_size;
       }
+
+      void modify_pair(const p &k, const p &new_pair) {
+        size_t l = 0, r = _size;
+        while (l < r) {
+          size_t mid = (l + r) / 2;
+          if (_key[mid] < k) l = mid + 1;
+          else r = mid;
+        }
+        if (l == _size || _key[l] != k) {
+          error("Key not found");
+        }
+        _key[l] = new_pair;
+      }
     };
 
 

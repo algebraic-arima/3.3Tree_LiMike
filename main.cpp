@@ -32,6 +32,10 @@ int main() {
       } else if (op == "find") {
         cin >> val;
         std::cout << bp.find(s, val) << '\n';
+      } else if (op == "ns") {
+//        std::cout<<bp.next_sibling(s)<<'\n';
+      } else if (op == "ps") {
+//        std::cout<<bp.prev_sibling(s)<<'\n';
       } else {
         continue;
       }
