@@ -214,19 +214,29 @@ namespace venillalemon {
         for (int j = 0; j < list[l]._size; j++) {
           list[r]._key[j] = list[l]._key[j];
           list[r]._chil[j] = list[l]._chil[j];
+          if (!list[r].is_leaf) list[list[r]._chil[j]]._par = r;
         }
         list[par].remove_pair(list[l]._key[list[l]._size - 1].first, list[l]._key[list[l]._size - 1].second);
         list[r]._size += list[l]._size;
         list[l]._size = 0;
         free_pos.push_back(l);
         if (list[par]._size < min_size) {
-          l = prev_sp_sibling(par), r = next_sp_sibling(par);
-          if (l != 0) {
-            if (list[l]._size > min_size) borrow_from_left(l, par);
-            else merge(l, par);
-          } else if (r != 0) {
-            if (list[r]._size > min_size) borrow_from_right(par, r);
-            else merge(par, r);
+          if (list[par]._par == 0) {
+            if (list[par]._size == 1) {
+              list[par]._size = 0;
+              root = list[par]._chil[0];
+              list[root]._par = 0;
+              free_pos.push_back(par);
+            }
+          } else {
+            l = prev_sp_sibling(par), r = next_sp_sibling(par);
+            if (l != 0) {
+              if (list[l]._size > min_size) borrow_from_left(l, par);
+              else merge(l, par);
+            } else if (r != 0) {
+              if (list[r]._size > min_size) borrow_from_right(par, r);
+              else merge(par, r);
+            }
           }
         }
       }
@@ -242,6 +252,7 @@ namespace venillalemon {
         for (int j = 0; j < bor_num; j++) {
           list[r]._key[j] = list[l]._key[j + bor_st];
           list[r]._chil[j] = list[l]._chil[j + bor_st];
+          if (!list[r].is_leaf) list[list[r]._chil[j]]._par = r;
         }
         list[l]._size -= bor_num;
         list[r]._size += bor_num;
@@ -254,6 +265,7 @@ namespace venillalemon {
         for (int j = 0; j < bor_num; j++) {
           list[l]._key[list[l]._size + j] = list[r]._key[j];
           list[l]._chil[list[l]._size + j] = list[r]._chil[j];
+          if (!list[l].is_leaf) list[list[r]._chil[j]]._par = l;
         }
         for (int j = 0; j < list[r]._size - bor_num; j++) {
           list[r]._key[j] = list[r]._key[j + bor_num];
@@ -268,6 +280,7 @@ namespace venillalemon {
 
       size_t size = 0;
       size_t root = 0;// 0 means empty
+      size_t free_num = 0;
       std::fstream index_filer;
       std::string index_file;
       std::vector<Node> list;
@@ -289,6 +302,7 @@ namespace venillalemon {
         index_filer.open(index_file, std::ios::out);
         index_filer.write(reinterpret_cast<char *>(&size), sizeof(size_t));
         index_filer.write(reinterpret_cast<char *>(&root), sizeof(size_t));
+        index_filer.write(reinterpret_cast<char *>(&free_num), sizeof(size_t));
         list.push_back(Node());
         index_filer.close();
       }
@@ -297,21 +311,32 @@ namespace venillalemon {
         index_filer.open(index_file, std::ios::in | std::ios::binary);
         index_filer.read(reinterpret_cast<char *>(&size), sizeof(size_t));
         index_filer.read(reinterpret_cast<char *>(&root), sizeof(size_t));
+        index_filer.read(reinterpret_cast<char *>(&free_num), sizeof(size_t));
         Node tmp;
         list.push_back(tmp);
         for (int i = 0; i < size; i++) {
           index_filer.read(reinterpret_cast<char *>(&tmp), sizeof(Node));
           list.push_back(tmp);
         }
+        size_t tm;
+        for (int i = 0; i < free_num; i++) {
+          index_filer.read(reinterpret_cast<char *>(&tm), sizeof(size_t));
+          free_pos.push_back(tm);
+        }
         index_filer.close();
       }
 
       void write_list() {
         index_filer.open(index_file, std::ios::in | std::ios::out | std::ios::binary);
+        free_num = free_pos.size();
         index_filer.write(reinterpret_cast<char *>(&size), sizeof(size_t));
         index_filer.write(reinterpret_cast<char *>(&root), sizeof(size_t));
+        index_filer.write(reinterpret_cast<char *>(&free_num), sizeof(size_t));
         for (int i = 1; i < list.size(); i++) {
           index_filer.write(reinterpret_cast<char *>(&list[i]), sizeof(Node));
+        }
+        for (int i = 0; i < free_num; i++) {
+          index_filer.write(reinterpret_cast<char *>(&free_pos[i]), sizeof(size_t));
         }
         index_filer.close();
       }
@@ -350,7 +375,10 @@ namespace venillalemon {
         }
 
         Node &node = list[pos];
-        node.insert_pair(k, v, val);
+        try { node.insert_pair(k, v, val); }
+        catch (...) {
+          return;
+        }
         if (node._size == degree) {
           divide_node(pos);
         }
@@ -360,12 +388,16 @@ namespace venillalemon {
         auto kv = p(k, v);
         size_t pos = list_lower_bound(kv);
         if (pos == 0) {
-          error("Key-value pair not found");
+          //error("Key-value pair not found");
+          return;
         }
         Node &node = list[pos];
-        if (kv == node._key[node._size - 1])
+        if (kv == node._key[node._size - 1] && node._par != 0)
           subs(node._par, node._key[node._size - 1], node._key[node._size - 2]);
-        node.remove_pair(k, v);
+        try { node.remove_pair(k, v); }
+        catch (...) {
+          return;
+        }
         if (node._size < min_size) {
           size_t l = prev_sp_sibling(pos), r = next_sp_sibling(pos);
           if (l != 0) {
@@ -389,7 +421,11 @@ namespace venillalemon {
 
 
       void clear() {
+        root = 0;
         size = 0;
+        free_pos.clear();
+        free_num = 0;
+        list.clear();
         index_filer.open(index_file, std::ios::out);
         index_filer.close();
         init_list();
@@ -413,6 +449,16 @@ namespace venillalemon {
             std::cout << "  " << node._chil[j];
           }
           std::cout << '\n';
+        }
+      }
+
+      void map_print(size_t pos) {
+        if (!list[pos].is_leaf) {
+          for (int i = 0; i < list[pos]._size; i++) {
+            map_print(list[pos]._chil[i]);
+          }
+        } else {
+          list[pos].print();
         }
       }
 

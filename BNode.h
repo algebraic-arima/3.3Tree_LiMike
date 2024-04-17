@@ -22,13 +22,13 @@ namespace venillalemon {
       bool is_leaf = false;
 
       void insert_pair(const K &k, const V &v, size_t val) {
-        size_t l = 0, r = _size;
+        int l = 0, r = _size;
         auto tmp_pair = p(k, v);
         if (tmp_pair < _key[0]) {
           l = r = 0;
         } else {
           while (l < r - 1) {
-            size_t mid = (l + r) / 2;
+            int mid = (l + r) / 2;
             if (tmp_pair < _key[mid]) r = mid;
             else l = mid;
           }
@@ -66,13 +66,16 @@ namespace venillalemon {
       }
 
       void remove_pair(const K &k, const V &v) {
-        size_t l = 0, r = _size;
+        if (_size == 0) {
+          error("Key-value pair not found");
+        }
+        int l = 0, r = _size;
         auto tmp_pair = p(k, v);
         if (tmp_pair == _key[_size - 1]) {
           l = r = _size - 1;
         } else {
           while (l < r - 1) {
-            size_t mid = (l + r) / 2;
+            int mid = (l + r) / 2;
             if (tmp_pair < _key[mid]) r = mid;
             else l = mid;
           }
@@ -98,6 +101,12 @@ namespace venillalemon {
           error("Key not found");
         }
         _key[l] = new_pair;
+      }
+
+      void print() {
+        for (size_t i = 0; i < _size; i++) {
+          std::cout << _key[i] << ' ';
+        }
       }
     };
 
