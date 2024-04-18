@@ -1,5 +1,6 @@
 #ifndef BPTREE_DATANODE_H
 #define BPTREE_DATANODE_H
+#pragma once
 
 #include <iostream>
 #include "utility.h"

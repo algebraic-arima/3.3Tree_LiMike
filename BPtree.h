@@ -67,8 +67,8 @@ namespace venillalemon {
           root = new_root_pos;
         } else {
           Node &par_node = list[node._par];
-          par_node.insert_pair(new_node._key[node._size - 1].first,
-                               new_node._key[node._size - 1].second, new_pos);
+          par_node.insert_pair(new_node._key[new_node._size - 1].first,
+                               new_node._key[new_node._size - 1].second, new_pos);
           if (par_node._size == degree) {
             divide_node(node._par);
           }
