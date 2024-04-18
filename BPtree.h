@@ -406,7 +406,7 @@ namespace venillalemon {
       void remove(const K &k, const V &v) {
         auto kv = p(k, v);
         size_t pos = list_lower_bound(kv);
-        if (pos == 0) {
+        if (pos == 0 || list[pos]._size == 0) {
           //error("Key-value pair not found");
           return;
         }

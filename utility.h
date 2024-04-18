@@ -39,7 +39,7 @@ namespace venillalemon {
 
     template<int length>
     std::ostream &operator<<(std::ostream &os, const m_string<length> m) {
-      os << m.id;
+      os << "\"" << m.id << "\"";
       return os;
     }
 

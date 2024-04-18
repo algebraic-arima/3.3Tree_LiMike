@@ -37,8 +37,8 @@ void find_key(const std::set<venillalemon::pair<K, V>> &m, const K &k) {
 typedef venillalemon::m_string<70> mstr;
 
 int main() {
-  venillalemon::BPTree<mstr, int, 1000, 400> bp("fn");
-//  std::set<venillalemon::pair<mstr, int>> mp;
+  venillalemon::BPTree<mstr, int, 6, 2> bp("fn");
+  std::set<venillalemon::pair<mstr, int>> mp;
   mstr s;
   int n;
   cin >> n;
@@ -53,29 +53,29 @@ int main() {
       break;
     } else if (op == "clear") {
       bp.clear();
-//      mp.clear();
+      mp.clear();
     } else {
       cin >> s;
       if (op == "insert") {
         cin >> val;
         bp.insert(s, val, val);
-//        bp.map_print(bp.root);
-//        std::cout << '\n';
-//        mp.insert({s, val});
-//        std_map_print(mp);
-//        std::cout << '\n';
+        bp.map_print(bp.root);
+        std::cout << '\n';
+        mp.insert({s, val});
+        std_map_print(mp);
+        std::cout << '\n';
       } else if (op == "delete") {
         cin >> val;
         bp.remove(s, val);
-//        bp.map_print(bp.root);
-//        std::cout << '\n';
-//        mp.erase({s, val});
-//        std_map_print(mp);
-//        std::cout << '\n';
+        bp.map_print(bp.root);
+        std::cout << '\n';
+        mp.erase({s, val});
+        std_map_print(mp);
+        std::cout << '\n';
       } else if (op == "find") {
 //        cin >> val;
         std::cout << bp.find(s) << '\n';
-//        find_key(mp, s);
+        find_key(mp, s);
       } else {
         continue;
       }
