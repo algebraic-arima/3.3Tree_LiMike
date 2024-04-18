@@ -3,8 +3,51 @@
 #pragma once
 
 #include <iostream>
+#include <cstring>
 
 namespace venillalemon {
+
+    template<int length>
+    class m_string {
+    public:
+      char id[length]{};
+
+      m_string() = default;
+
+      explicit m_string(const char _key[]) {
+        strcpy(id, _key);
+      }
+
+      m_string &operator=(const m_string &rhs) {
+        if (this == &rhs) return *this;
+        strcpy(id, rhs.id);
+        return *this;
+      }
+
+      bool operator==(const m_string &rhs) const {
+        return (strcmp(id, rhs.id) == 0);
+      }
+
+      bool operator!=(const m_string &rhs) const {
+        return (strcmp(id, rhs.id) != 0);
+      }
+
+      bool operator<(const m_string &rhs) const {
+        return (strcmp(id, rhs.id) < 0);
+      }
+    };
+
+    template<int length>
+    std::ostream &operator<<(std::ostream &os, const m_string<length> m) {
+      os << m.id;
+      return os;
+    }
+
+    template<int length>
+    std::istream &operator>>(std::istream &is, m_string<length> &m) {
+      is >> m.id;
+      return is;
+    }
 
     template<class T1, class T2>
     class pair {

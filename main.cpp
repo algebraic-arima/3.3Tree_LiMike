@@ -34,10 +34,12 @@ void find_key(const std::set<venillalemon::pair<K, V>> &m, const K &k) {
   std::cout << '\n';
 }
 
+typedef venillalemon::m_string<70> mstr;
+
 int main() {
-  venillalemon::BPTree<std::string, int, 800, 300> bp("fn");
-  std::set<venillalemon::pair<int, int>> mp;
-  std::string s;
+  venillalemon::BPTree<mstr, int, 600, 200> bp("fn");
+//  std::set<venillalemon::pair<mstr, int>> mp;
+  mstr s;
   int n;
   cin >> n;
   std::string op;
