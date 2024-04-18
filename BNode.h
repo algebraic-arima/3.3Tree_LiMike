@@ -65,6 +65,26 @@ namespace venillalemon {
         return l;
       }
 
+      size_t lower_bound(const K &k) {
+        int l = 0, r = _size;
+        while (l < r) {
+          int mid = (l + r) / 2;
+          if (_key[mid].first < k) l = mid + 1;
+          else r = mid;
+        }
+        return l;
+      }
+
+      size_t upper_bound(const K &k) {
+        int l = 0, r = _size;
+        while (l < r) {
+          int mid = (l + r) / 2;
+          if (k < _key[mid].first) r = mid;
+          else l = mid + 1;
+        }
+        return l;
+      }
+
       void remove_pair(const K &k, const V &v) {
         if (_size == 0) {
           error("Key-value pair not found");

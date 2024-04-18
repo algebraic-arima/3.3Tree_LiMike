@@ -9,6 +9,8 @@ add_executable(BPTree
         BNode.h
         BlockRiver.h
         BPtree.h
+        DataNode.h
         error.h
         utility.h
-        main.cpp)
+        main.cpp
+)

@@ -80,10 +80,9 @@ namespace venillalemon {
       /// If all elements are less than kv, the node on it is the max node;
       /// or if all elements are greater than kv, it = 0.
       size_t block_lower_bound(const p &kv) {
-        Node node;
         size_t pos = list_lower_bound(kv);
         if (pos == 0) return 0;
-        read_node(node, pos);
+        Node &node = list[pos];
         size_t i = node._size;
         while (i > 0 && kv < node._key[i - 1]) --i;
         return node._chil[i - 1];
@@ -126,6 +125,26 @@ namespace venillalemon {
         while (!list[pos].is_leaf) {
           size_t i = list[pos].lower_bound(kv);
           if (i == list[pos]._size) return 0;
+          pos = list[pos]._chil[i];
+        }
+        return pos;
+      }
+
+      size_t lower_bound(const K &k) {
+        size_t pos = root;
+        while (!list[pos].is_leaf) {
+          size_t i = list[pos].lower_bound(k);
+          if (i == list[pos]._size) --i;
+          pos = list[pos]._chil[i];
+        }
+        return pos;
+      }
+
+      size_t upper_bound(const K &k) {
+        size_t pos = root;
+        while (!list[pos].is_leaf) {
+          size_t i = list[pos].upper_bound(k);
+          if (i == list[pos]._size) --i;
           pos = list[pos]._chil[i];
         }
         return pos;
@@ -419,6 +438,22 @@ namespace venillalemon {
         return block_lower_bound({k, v});
       }
 
+      std::vector<size_t> find(const K &k) {
+        std::vector<size_t> res;
+        size_t pos = lower_bound(k);
+        size_t fini = upper_bound(k);
+        size_t next;
+        while (pos != 0) {
+          Node &node = list[pos];
+          for (int i = list[pos].lower_bound(k); i < list[pos].upper_bound(k); i++) {
+            res.push_back(node._key[i].second);
+          }
+          next = next_sibling(pos);
+          if (pos == fini) break;
+          pos = next;
+        }
+        return res;
+      }
 
       void clear() {
         root = 0;

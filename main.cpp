@@ -12,10 +12,32 @@ void std_map_print(std::set<venillalemon::pair<K, V>> &m) {
   }
 }
 
+template<class T>
+std::ostream &operator<<(std::ostream &os, const std::vector<T> &m) {
+  if (m.empty()) {
+    std::cout << "null";
+    return os;
+  }
+  for (auto &i: m) {
+    os << i << ' ';
+  }
+  return os;
+}
+
+template<class K, class V>
+void find_key(const std::set<venillalemon::pair<K, V>> &m, const K &k) {
+  auto it = m.lower_bound({k, -10000});
+  while (it != m.upper_bound({k, 10000})) {
+    std::cout << it->second << ' ';
+    ++it;
+  }
+  std::cout << '\n';
+}
+
 int main() {
-  venillalemon::BPTree<int, int, 6, 2> bp("fn");
+  venillalemon::BPTree<std::string, int, 600, 200> bp("fn");
   std::set<venillalemon::pair<int, int>> mp;
-  int s;
+  std::string s;
   int n;
   cin >> n;
   std::string op;
@@ -29,28 +51,29 @@ int main() {
       break;
     } else if (op == "clear") {
       bp.clear();
-      mp.clear();
+//      mp.clear();
     } else {
       cin >> s;
       if (op == "insert") {
         cin >> val;
         bp.insert(s, val, val * 1248 % 3413);
-        bp.map_print(bp.root);
-        std::cout << '\n';
-        mp.insert({s, val});
-        std_map_print(mp);
-        std::cout << '\n';
+//        bp.map_print(bp.root);
+//        std::cout << '\n';
+//        mp.insert({s, val});
+//        std_map_print(mp);
+//        std::cout << '\n';
       } else if (op == "delete") {
         cin >> val;
         bp.remove(s, val);
-        bp.map_print(bp.root);
-        std::cout << '\n';
-        mp.erase({s,val});
-        std_map_print(mp);
-        std::cout << '\n';
+//        bp.map_print(bp.root);
+//        std::cout << '\n';
+//        mp.erase({s, val});
+//        std_map_print(mp);
+//        std::cout << '\n';
       } else if (op == "find") {
-        cin >> val;
-        std::cout << bp.find(s, val) << '\n';
+//        cin >> val;
+        std::cout << bp.find(s) << '\n';
+//        find_key(mp, s);
       } else {
         continue;
       }
