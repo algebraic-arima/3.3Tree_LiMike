@@ -22,6 +22,12 @@ namespace venillalemon {
       bool is_leaf = false;
 
       void insert_pair(const K &k, const V &v, size_t val) {
+        if (_size == 0) {
+          _key[0] = p(k, v);
+          _chil[0] = val;
+          _size++;
+          return;
+        }
         int l = 0, r = _size;
         auto tmp_pair = p(k, v);
         if (tmp_pair < _key[0]) {
