@@ -37,7 +37,7 @@ void find_key(const std::set<venillalemon::pair<K, V>> &m, const K &k) {
 typedef venillalemon::m_string<70> mstr;
 
 int main() {
-  venillalemon::BPTree<mstr, int, 7, 2> bp("fn");
+  venillalemon::BPTree<mstr, int, 1000, 400> bp("fn");
 //  std::set<venillalemon::pair<mstr, int>> mp;
   mstr s;
   int n;
@@ -58,7 +58,7 @@ int main() {
       cin >> s;
       if (op == "insert") {
         cin >> val;
-        bp.insert(s, val, val * 1248 % 3413);
+        bp.insert(s, val, val);
 //        bp.map_print(bp.root);
 //        std::cout << '\n';
 //        mp.insert({s, val});
