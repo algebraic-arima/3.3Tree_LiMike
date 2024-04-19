@@ -150,6 +150,15 @@ namespace venillalemon {
 
       void pop_back() {
         if (_size != 0) _size--;
+        if (_size < _capacity / 3) {
+          _capacity /= 2;
+          T *tmp = new T[_capacity];
+          for (size_t i = 0; i < _size; i++) {
+            tmp[i] = data[i];
+          }
+          delete[] data;
+          data = tmp;
+        }
       }
 
       void clear() {
