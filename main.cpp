@@ -13,17 +13,17 @@ void std_map_print(std::set<venillalemon::pair<K, V>> &m) {
   }
 }
 
-template<class T>
-std::ostream &operator<<(std::ostream &os, const std::vector<T> &m) {
-  if (m.empty()) {
-    std::cout << "null";
-    return os;
-  }
-  for (auto &i: m) {
-    os << i << ' ';
-  }
-  return os;
-}
+//template<class T>
+//std::ostream &operator<<(std::ostream &os, const std::vector<T> &m) {
+//  if (m.empty()) {
+//    std::cout << "null";
+//    return os;
+//  }
+//  for (auto &i: m) {
+//    os << i << ' ';
+//  }
+//  return os;
+//}
 
 template<class K, class V>
 void find_key(const std::set<venillalemon::pair<K, V>> &m, const K &k) {

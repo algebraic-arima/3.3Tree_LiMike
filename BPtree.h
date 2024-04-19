@@ -8,7 +8,6 @@
 #include <cmath>
 #include <filesystem>
 #include <utility>
-#include <vector>
 #include "error.h"
 #include "BNode.h"
 #include "utility.h"
@@ -292,8 +291,8 @@ namespace venillalemon {
       size_t free_num = 0;
       std::fstream index_filer;
       std::string index_file;
-      std::vector<Node> list;
-      std::vector<size_t> free_pos;
+      venillalemon::vector<Node> list;
+      venillalemon::vector<size_t> free_pos;
 
       explicit BPTree(const std::string &ifn) : index_file(ifn + "_index") {
         index_filer.open(index_file, std::ios::in);
@@ -451,8 +450,8 @@ namespace venillalemon {
       /// returns the possible position of the key-value pair
       /// i.e. the position of the last node
       /// such that kv >= node._key[0]
-      std::vector<size_t> find(const K &k) {
-        std::vector<size_t> res;
+      venillalemon::vector<size_t> find(const K &k) {
+        venillalemon::vector<size_t> res;
         size_t pos = lower_bound(k);
         size_t fini = upper_bound(k);
         size_t next;

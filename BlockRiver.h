@@ -8,7 +8,6 @@
 #include <cmath>
 #include <filesystem>
 #include <utility>
-#include <vector>
 #include "error.h"
 #include "BPtree.h"
 #include "DataNode.h"
@@ -142,10 +141,10 @@ namespace venillalemon {
 
       void find(const K &k) {
         bool flag = false;
-        std::vector<size_t> tmp = list.find(k);
-        for (auto &i: tmp) {
+        venillalemon::vector<size_t> tmp = list.find(k);
+        for (int i = 0; i < tmp.size(); i++) {
           DNode t;
-          read_main(t, i);
+          read_main(t, tmp[i]);
           for (int j = 0; j < t.size; j++) {
             if (t._data[j].first == k) {
               std::cout << t._data[j].second << ' ';

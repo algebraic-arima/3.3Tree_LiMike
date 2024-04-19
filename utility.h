@@ -140,6 +140,25 @@ namespace venillalemon {
         return data[_size - 1];
       }
 
+      T &front() {
+        return data[0];
+      }
+
+      bool empty() {
+        return _size == 0;
+      }
+
+      void pop_back() {
+        if (_size != 0) _size--;
+      }
+
+      void clear() {
+        delete[] data;
+        _size = 0;
+        _capacity = 10;
+        data = new T[_capacity];
+      }
+
     };
 }
 
