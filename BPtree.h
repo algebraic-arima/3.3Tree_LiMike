@@ -110,7 +110,6 @@ namespace venillalemon {
       void insert_max_adjust(const p &kv) {
         size_t pos = root;
         while (!list[pos].is_leaf) {
-          if (list[pos]._size == 0) error("Empty node");
           list[pos]._key[list[pos]._size - 1] = kv;
           pos = list[pos]._chil[list[pos]._size - 1];
         }
@@ -427,6 +426,9 @@ namespace venillalemon {
             if (list[r]._size > min_size) borrow_from_right(pos, r);
             else merge(pos, r);
           }
+        }
+        if (list[root]._size == 0) {
+          clear();
         }
       }
 

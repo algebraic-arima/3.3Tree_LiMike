@@ -85,25 +85,28 @@ namespace venillalemon {
           list.insert(k, v, 1);
           return;
         }
-        size_t it = list.upper_bound(kv);
+        size_t it = list.block_lower_bound(kv);
 
         if (it == 0) {
-          list.adjust(kv);
-          // adjust the minimum to kv
-          it = list.upper_bound(kv);
+          list.insert_max_adjust(kv);
+          // adjust the maximum to kv
+          it = list.block_lower_bound(kv);
           // it points to a min node
-        }
+        }// kv is greater than the maximum
         DNode tmp;
         read_main(tmp, it);
         tmp.insert_pair(k, v);
         if (tmp.size >= block) {
           DNode new_node;
-          new_node.size = tmp.size - tmp.size / 2;
-          for (int i = tmp.size / 2; i < tmp.size; i++) {
-            new_node._data[i - tmp.size / 2] = tmp._data[i];
+          new_node.size = tmp.size / 2;
+          for (int i = 0; i < tmp.size / 2; i++) {
+            new_node._data[i] = tmp._data[i];
           }
-          tmp.size /= 2;
-          list.insert(new_node._data[0].key, new_node._data[0].value, block_num + 1);
+          for (int i = tmp.size / 2; i < tmp.size; i++) {
+            tmp._data[i - tmp.size / 2] = tmp._data[i];
+          }
+          tmp.size -= tmp.size / 2;
+          list.insert(new_node._data[new_node.size - 1].key, new_node._data[new_node.size - 1].value, block_num + 1);
           //std::cout << new_node.first.key << new_node.first.pos << block_num + 1 << '\n';
           append_main(new_node);
         }
@@ -112,15 +115,15 @@ namespace venillalemon {
 
       void remove(K &k, V &v) {
         KV kv = {k, v};
-        auto it = list.upper_bound(kv);
+        auto it = list.block_lower_bound(kv);
         if (it == 0) return;
         DNode tmp;
         read_main(tmp, it);
 
-        if (kv == tmp._data[0]) {
-          list.remove(k, v, it);
+        if (kv == tmp._data[tmp.size - 1]) {
+          list.remove(k, v);
           if (tmp.size != 1) {
-            list.insert(tmp._data[1].key, tmp._data[1].value, it);
+            list.insert(tmp._data[tmp.size - 2].key, tmp._data[tmp.size - 2].value, it);
           }
         }
         tmp.remove_pair(k, v);
