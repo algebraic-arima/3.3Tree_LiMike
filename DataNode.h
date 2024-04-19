@@ -6,13 +6,13 @@
 #include "utility.h"
 #include "error.h"
 
-namespace venillalemon{
+namespace venillalemon {
     template<class K, class V, size_t block>
     class DataNode {
     public:
-      
+
       typedef pair<K, V> p;
-      
+
       size_t size = 0;
       p _data[block];
 
@@ -23,12 +23,12 @@ namespace venillalemon{
       }
 
       void insert_pair(K key, V val) {
-        size_t l = 0, r = size;
+        int l = 0, r = size;
         auto tmp_pair = p({key, val});
-        while (l < r - 1) {
-          size_t mid = (l + r) / 2;
-          if (tmp_pair < _data[mid]) r = mid;
-          else l = mid;
+        while (l < r) {
+          int mid = (l + r) / 2;
+          if (_data[mid] < tmp_pair) l = mid + 1;
+          else r = mid;
         }
         if (_data[l] == tmp_pair) {
           error("Duplicated key and value");
@@ -41,12 +41,12 @@ namespace venillalemon{
       }
 
       void remove_pair(K key, V val) {
-        size_t l = 0, r = size;
+        int l = 0, r = size;
         auto tmp_pair = p({key, val});
         while (l < r) {
-          size_t mid = (l + r) / 2;
-          if (tmp_pair < _data[mid]) r = mid;
-          else l = mid;
+          int mid = (l + r) / 2;
+          if (_data[mid] < tmp_pair) l = mid + 1;
+          else r = mid;
         }
         if (_data[l] != tmp_pair) {
           error("Key-value pair not found");
@@ -80,9 +80,9 @@ namespace venillalemon{
       }
 
       void print() {
-        std::cout << "___" << _data[0].key << "   " << _data[0].value << '\n';
+        std::cout << "___" << '\n';
         for (int i = 0; i < size; ++i) {
-          std::cout << "   " << _data[i].key << "   " << _data[i].value << '\n';
+          std::cout << "   " << _data[i].first << "   " << _data[i].second << '\n';
         }
       }
 

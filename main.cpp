@@ -2,6 +2,7 @@
 #include <set>
 #include <string>
 #include "BPtree.h"
+#include "BlockRiver.h"
 
 using std::cin;
 
@@ -34,10 +35,10 @@ void find_key(const std::set<venillalemon::pair<K, V>> &m, const K &k) {
   std::cout << '\n';
 }
 
-typedef venillalemon::m_string<70> mstr;
+typedef venillalemon::m_string<69> mstr;
 
 int main() {
-  venillalemon::BPTree<mstr, int, 1000, 400> bp("fn");
+  venillalemon::BlockRiver<mstr, int, 56> bp("fn");
 //  std::set<venillalemon::pair<mstr, int>> mp;
   mstr s;
   int n;
@@ -58,7 +59,7 @@ int main() {
       cin >> s;
       if (op == "insert") {
         cin >> val;
-        bp.insert(s, val, val);
+        bp.insert(s, val);
 //        bp.map_print(bp.root);
 //        std::cout << '\n';
 //        mp.insert({s, val});
@@ -74,7 +75,7 @@ int main() {
 //        std::cout << '\n';
       } else if (op == "find") {
 //        cin >> val;
-        std::cout << bp.find(s) << '\n';
+        bp.find(s);
 //        find_key(mp, s);
       } else {
         continue;
