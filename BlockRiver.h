@@ -20,7 +20,7 @@ namespace venillalemon {
 
       typedef pair<K, V> KV;
       typedef DataNode<K, V, block> DNode;
-      typedef BPTree<K, V, 500, 200> map;
+      typedef BPTree<K, V, 100, 40> map;
 
       size_t block_num = 0;
       std::fstream data_filer;
