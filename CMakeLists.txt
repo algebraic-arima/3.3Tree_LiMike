@@ -14,5 +14,4 @@ add_executable(code
         error.h
         utility.h
         main.cpp
-        Buffer.h
-)
+        Buffer.h)
