@@ -6,7 +6,7 @@
 #include "utility.h"
 #include "error.h"
 
-namespace venillalemon {
+namespace arima_kana {
     template<class K, class V, size_t block>
     class DataNode {
     public:

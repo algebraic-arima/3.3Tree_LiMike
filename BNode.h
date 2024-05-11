@@ -6,7 +6,7 @@
 #include "error.h"
 #include "utility.h"
 
-namespace venillalemon {
+namespace arima_kana {
     template<class K, class V, size_t degree>
     class BNode {
     public:

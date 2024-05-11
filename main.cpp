@@ -7,7 +7,7 @@
 using std::cin;
 
 template<class K, class V>
-void std_map_print(std::set<venillalemon::pair<K, V>> &m) {
+void std_map_print(std::set<arima_kana::pair<K, V>> &m) {
   for (auto &i: m) {
     std::cout << '(' << i.first << ',' << i.second << ')' << ' ';
   }
@@ -26,7 +26,7 @@ void std_map_print(std::set<venillalemon::pair<K, V>> &m) {
 //}
 
 template<class K, class V>
-void find_key(const std::set<venillalemon::pair<K, V>> &m, const K &k) {
+void find_key(const std::set<arima_kana::pair<K, V>> &m, const K &k) {
   auto it = m.lower_bound({k, -10000});
   while (it != m.upper_bound({k, 10000})) {
     std::cout << it->second << ' ';
@@ -35,11 +35,11 @@ void find_key(const std::set<venillalemon::pair<K, V>> &m, const K &k) {
   std::cout << '\n';
 }
 
-typedef venillalemon::m_string<69> mstr;
+typedef arima_kana::m_string<69> mstr;
 
 int main() {
-  venillalemon::BlockRiver<mstr, int, 56> bp("fn");
-//  std::set<venillalemon::pair<mstr, int>> mp;
+  arima_kana::BlockRiver<mstr, int, 56> bp("fn");
+//  std::set<arima_kana::pair<mstr, int>> mp;
   mstr s;
   int n;
   cin >> n;

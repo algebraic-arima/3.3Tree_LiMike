@@ -12,7 +12,7 @@
 #include "BNode.h"
 #include "utility.h"
 
-namespace venillalemon {
+namespace arima_kana {
     template<class K, class V, size_t degree, size_t min_size>
     class BPTree {
       typedef BNode<K, V, degree> Node;
@@ -291,17 +291,17 @@ namespace venillalemon {
       size_t free_num = 0;
       std::fstream index_filer;
       std::string index_file;
-      venillalemon::vector<Node> list;
-      venillalemon::vector<size_t> free_pos;
+      arima_kana::vector<Node> list;
+      arima_kana::vector<size_t> free_pos;
 
       explicit BPTree(const std::string &ifn) : index_file(ifn + "_index") {
         index_filer.open(index_file, std::ios::in);
         if (!index_filer.is_open()) {
           index_filer.close();
-          init_list();
+          init_list();// buf
         } else {
           index_filer.close();
-          read_list();
+          read_list();// buf
         }
       }
 
@@ -351,14 +351,14 @@ namespace venillalemon {
 
       void read_node(Node &dn, size_t pos) {
         index_filer.open(index_file, std::ios::in | std::ios::binary);
-        index_filer.seekg(2 * sizeof(size_t) + (pos - 1) * sizeof(Node));
+        index_filer.seekg(3 * sizeof(size_t) + (pos - 1) * sizeof(Node));
         index_filer.read(reinterpret_cast<char *>(&dn), sizeof(Node));
         index_filer.close();
       }
 
       void write_node(Node &dn, size_t pos) {
         index_filer.open(index_file, std::ios::in | std::ios::out | std::ios::binary);
-        index_filer.seekp(2 * sizeof(size_t) + (pos - 1) * sizeof(Node));
+        index_filer.seekp(3 * sizeof(size_t) + (pos - 1) * sizeof(Node));
         index_filer.write(reinterpret_cast<char *>(&dn), sizeof(Node));
         index_filer.close();
       }
@@ -450,8 +450,8 @@ namespace venillalemon {
       /// returns the possible position of the key-value pair
       /// i.e. the position of the last node
       /// such that kv >= node._key[0]
-      venillalemon::vector<size_t> find(const K &k) {
-        venillalemon::vector<size_t> res;
+      arima_kana::vector<size_t> find(const K &k) {
+        arima_kana::vector<size_t> res;
         size_t pos = lower_bound(k);
         size_t fini = upper_bound(k);
         size_t next;

@@ -5,7 +5,7 @@
 #include <iostream>
 #include <cstring>
 
-namespace venillalemon {
+namespace arima_kana {
 
     template<int length>
     class m_string {
@@ -166,6 +166,10 @@ namespace venillalemon {
         _size = 0;
         _capacity = 10;
         data = new T[_capacity];
+      }
+
+      ~vector() {
+        delete[] data;
       }
 
     };

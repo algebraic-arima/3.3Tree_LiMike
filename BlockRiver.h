@@ -12,7 +12,7 @@
 #include "BPtree.h"
 #include "DataNode.h"
 
-namespace venillalemon {
+namespace arima_kana {
     template<class K, class V, size_t block>
     class BlockRiver {
     public:
@@ -141,7 +141,7 @@ namespace venillalemon {
 
       void find(const K &k) {
         bool flag = false;
-        venillalemon::vector<size_t> tmp = list.find(k);
+        arima_kana::vector<size_t> tmp = list.find(k);
         for (int i = 0; i < tmp.size(); i++) {
           DNode t;
           read_main(t, tmp[i]);
