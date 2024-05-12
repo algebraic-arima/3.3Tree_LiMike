@@ -1,5 +1,6 @@
 #ifndef BPTREE_BUFFER_H
 #define BPTREE_BUFFER_H
+#pragma once
 
 #include <iostream>
 #include <fstream>
