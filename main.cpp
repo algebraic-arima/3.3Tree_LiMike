@@ -39,7 +39,7 @@ void find_key(const std::set<arima_kana::pair<K, V>> &m, const K &k) {
 typedef arima_kana::m_string<69> mstr;
 
 int main() {
-  arima_kana::BlockRiver<mstr, int, 56> bp("fn");
+  arima_kana::BlockRiver<mstr, int, 106> bp("fn");
 //  std::set<arima_kana::pair<mstr, int>> mp;
   mstr s;
   int n;
