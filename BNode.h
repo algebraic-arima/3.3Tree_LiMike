@@ -134,6 +134,19 @@ namespace arima_kana {
           std::cout << _key[i] << ' ';
         }
       }
+
+      bool operator==(const BNode &other) const {
+        if (_size != other._size) return false;
+        if (_par != other._par) return false;
+        if (is_leaf != other.is_leaf) return false;
+        for (size_t i = 0; i < _size; i++) {
+          if (_chil[i] != other._chil[i]) return false;
+        }
+        for (size_t i = 0; i < _size; i++) {
+          if (_key[i] != other._key[i]) return false;
+        }
+        return true;
+      }
     };
 
 

@@ -44,6 +44,7 @@ namespace arima_kana {
       }
 
       ~BlockRiver() {
+//        std::cout << "~BlockRiver\n";
         write_data();
       }
 

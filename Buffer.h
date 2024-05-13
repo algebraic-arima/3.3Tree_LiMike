@@ -12,49 +12,20 @@ namespace arima_kana {
       struct Node {
         size_t pos;
         T data;
+        T copy;
         Node *next;
         Node *prev;
       };
 
-
-      T &operator[](size_t pos) {
-        Node *tmp = head->next;
-        while (tmp != tail) {
-          if (tmp->pos == pos) {
-            tmp->prev->next = tmp->next;
-            tmp->next->prev = tmp->prev;
-            tmp->next = head->next;
-            tmp->prev = head;
-            head->next->prev = tmp;
-            head->next = tmp;
-            return tmp->data;
-          }
-          tmp = tmp->next;
-        }
-        Node *new_n = new Node(pos, T(), head->next, head);
-        read_node(new_n->data, pos);
-        head->next->prev = new_n;
-        head->next = new_n;
-        ++_size;
-        if (_size > _cap) {
-          tmp = tail->prev;
-          tmp->prev->next = tail;
-          tail->prev = tmp->prev;
-          write_node(tmp->data, tmp->pos);
-          delete tmp;
-          --_size;
-        }
-      }
-
-      void read_node(Node &dn, size_t pos) {
-        file.open(name, std::ios::in | std::ios::binary);
+      void read_node(T &dn, size_t pos) {
+        file.open(name, std::ios::in | std::ios::out | std::ios::binary);
         file.seekg(num * sizeof(pre) + (pos - 1) * sizeof(T));
         file.read(reinterpret_cast<char *>(&dn), sizeof(T));
         file.close();
       }
 
-      void write_node(Node &dn, size_t pos) {
-        file.open(name, std::ios::out | std::ios::binary);
+      void write_node(T &dn, size_t pos) {
+        file.open(name, std::ios::in | std::ios::out | std::ios::binary);
         file.seekp(num * sizeof(pre) + (pos - 1) * sizeof(T));
         file.write(reinterpret_cast<char *>(&dn), sizeof(T));
         file.close();
@@ -78,6 +49,50 @@ namespace arima_kana {
         _cap = c;
       }
 
+      ~Buffer() {
+//        std::cout << "~Buffer\n";
+        Node *tmp = head->next;
+        while (tmp != tail) {
+          if (!(tmp->data == tmp->copy))
+            write_node(tmp->data, tmp->pos);
+          Node *tmp2 = tmp;
+          tmp = tmp->next;
+          delete tmp2;
+        }
+        delete head;
+        delete tail;
+      }
+
+      T &operator[](size_t pos) {
+        Node *tmp = head->next;
+        while (tmp != tail) {
+          if (tmp->pos == pos) {
+            tmp->prev->next = tmp->next;
+            tmp->next->prev = tmp->prev;
+            tmp->next = head->next;
+            tmp->prev = head;
+            head->next->prev = tmp;
+            head->next = tmp;
+            return tmp->data;
+          }
+          tmp = tmp->next;
+        }
+        Node *new_n = new Node{pos, T(), T(), head->next, head};
+        read_node(new_n->data, pos);
+        new_n->copy = new_n->data;
+        head->next->prev = new_n;
+        head->next = new_n;
+        ++_size;
+        if (_size > _cap) {
+          tmp = tail->prev;
+          tmp->prev->next = tail;
+          tail->prev = tmp->prev;
+          if (!(tmp->data == tmp->copy)) write_node(tmp->data, tmp->pos);
+          delete tmp;
+          --_size;
+        }
+        return new_n->data;
+      }
 
     };
 }
