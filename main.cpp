@@ -6,6 +6,7 @@
 #include "BlockRiver.h"
 
 using std::cin;
+using std::cout;
 
 template<class K, class V>
 void std_map_print(std::set<arima_kana::pair<K, V>> &m) {
@@ -39,7 +40,10 @@ void find_key(const std::set<arima_kana::pair<K, V>> &m, const K &k) {
 typedef arima_kana::m_string<69> mstr;
 
 int main() {
-  arima_kana::BlockRiver<mstr, int, 106> bp("fn");
+  std::ios::sync_with_stdio(false);
+  cin.tie(nullptr);
+  cout.tie(nullptr);
+  arima_kana::BlockRiver<mstr, int, 86> bp("fn");
 //  std::set<arima_kana::pair<mstr, int>> mp;
   mstr s;
   int n;
