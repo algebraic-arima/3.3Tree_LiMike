@@ -6,13 +6,13 @@
 #include <fstream>
 
 namespace arima_kana {
-    template<class T, class pre, size_t num,size_t _cap>
+    template<class T, class pre, size_t num, size_t _cap>
     class Buffer {
 
       struct Node {
         size_t pos;
         T data;
-        T copy;
+//        T copy;
         Node *next;
         Node *prev;
       };
@@ -47,7 +47,7 @@ namespace arima_kana {
         _size = 0;
       }
 
-      void clear(){
+      void clear() {
         Node *tmp = head->next;
         while (tmp != tail) {
           Node *tmp2 = tmp;
@@ -63,8 +63,8 @@ namespace arima_kana {
 //        std::cout << "~Buffer\n";
         Node *tmp = head->next;
         while (tmp != tail) {
-          if (!(tmp->data == tmp->copy))
-            write_node(tmp->data, tmp->pos);
+//          if (!(tmp->data == tmp->copy))
+          write_node(tmp->data, tmp->pos);
           Node *tmp2 = tmp;
           tmp = tmp->next;
           delete tmp2;
@@ -87,9 +87,9 @@ namespace arima_kana {
           }
           tmp = tmp->next;
         }
-        Node *new_n = new Node{pos, T(), T(), head->next, head};
+        Node *new_n = new Node{pos, T(), head->next, head};
         read_node(new_n->data, pos);
-        new_n->copy = new_n->data;
+//        new_n->copy = new_n->data;
         head->next->prev = new_n;
         head->next = new_n;
         ++_size;
@@ -97,7 +97,8 @@ namespace arima_kana {
           tmp = tail->prev;
           tmp->prev->next = tail;
           tail->prev = tmp->prev;
-          if (!(tmp->data == tmp->copy)) write_node(tmp->data, tmp->pos);
+//          if (!(tmp->data == tmp->copy))
+          write_node(tmp->data, tmp->pos);
           delete tmp;
           --_size;
         }
