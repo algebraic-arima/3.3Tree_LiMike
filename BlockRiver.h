@@ -21,7 +21,7 @@ namespace arima_kana {
       typedef pair<K, V> KV;
       typedef DataNode<K, V, block> DNode;
       typedef BPTree<K, V, 100, 40> map;
-      typedef Buffer<DNode, size_t, 1, 100> buffer;
+      typedef Buffer<DNode, size_t, 1, 10> buffer;
 
       size_t block_num = 0;
       std::fstream data_filer;
