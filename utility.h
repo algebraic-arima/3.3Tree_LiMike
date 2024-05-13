@@ -53,7 +53,7 @@ namespace arima_kana {
     unsigned long long hash(const m_string<length> &key) {
       unsigned long long h = 0;
       for (int i = 0; i < length; i++) {
-        h = h * 233 + key.id[i];
+        h = h * 1471 + key.id[i];
       }
       return h;
     }
