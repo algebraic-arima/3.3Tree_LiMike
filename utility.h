@@ -1,5 +1,5 @@
-#ifndef BPTREE_VECTOR_HPP
-#define BPTREE_VECTOR_HPP
+#ifndef BPTREE_UTILITY_H
+#define BPTREE_UTILITY_H
 #pragma once
 
 #include <iostream>

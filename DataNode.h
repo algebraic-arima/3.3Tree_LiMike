@@ -86,6 +86,14 @@ namespace arima_kana {
         }
       }
 
+      bool operator==(const DataNode &other) const {
+        if (size != other.size) return false;
+        for (int i = 0; i < size; ++i) {
+          if (_data[i] != other._data[i]) return false;
+        }
+        return true;
+      }
+
     };
 
 }

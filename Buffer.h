@@ -6,7 +6,7 @@
 #include <fstream>
 
 namespace arima_kana {
-    template<class T, class pre, size_t num>
+    template<class T, class pre, size_t num,size_t _cap>
     class Buffer {
 
       struct Node {
@@ -34,19 +34,29 @@ namespace arima_kana {
       Node *head;
       Node *tail;
       size_t _size;
-      size_t _cap;
       std::fstream file;
       std::string name;
     public:
 
-      Buffer(const std::string &fn, size_t c) {
+      Buffer(const std::string &fn) {
         name = fn;
         head = new Node();
         tail = new Node();
         head->next = tail;
         tail->prev = head;
         _size = 0;
-        _cap = c;
+      }
+
+      void clear(){
+        Node *tmp = head->next;
+        while (tmp != tail) {
+          Node *tmp2 = tmp;
+          tmp = tmp->next;
+          delete tmp2;
+        }
+        head->next = tail;
+        tail->prev = head;
+        _size = 0;
       }
 
       ~Buffer() {

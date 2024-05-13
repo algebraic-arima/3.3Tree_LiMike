@@ -11,6 +11,7 @@
 #include "error.h"
 #include "BPtree.h"
 #include "DataNode.h"
+#include "Buffer.h"
 
 namespace arima_kana {
     template<class K, class V, size_t block>
@@ -20,13 +21,18 @@ namespace arima_kana {
       typedef pair<K, V> KV;
       typedef DataNode<K, V, block> DNode;
       typedef BPTree<K, V, 100, 40> map;
+      typedef Buffer<DNode, size_t, 1, 10000> buffer;
 
       size_t block_num = 0;
       std::fstream data_filer;
       std::string data_file;
       map list;
+      buffer data_list;
 
-      explicit BlockRiver(const std::string &df) : data_file(df), list(df) {
+      explicit BlockRiver(const std::string &df) :
+              data_file(df),
+              list(df),
+              data_list(df) {
         data_filer.open(data_file, std::ios::in);
         if (!data_filer.is_open()) {
           data_filer.close();
@@ -91,6 +97,7 @@ namespace arima_kana {
           DNode tmp(kv);
           append_main(tmp);
           list.insert(k, v, block_num);
+          data_list[block_num] = tmp;
           return;
         }
         size_t it = list.block_lower_bound(kv);
@@ -101,8 +108,7 @@ namespace arima_kana {
           it = list.block_lower_bound(kv);
           // it points to a min node
         }// kv is greater than the maximum
-        DNode tmp;
-        read_main(tmp, it);
+        DNode &tmp = data_list[it];
         try { tmp.insert_pair(k, v); }
         catch (...) { return; }
         if (tmp.size >= block) {
@@ -118,16 +124,15 @@ namespace arima_kana {
           list.insert(new_node._data[new_node.size - 1].first, new_node._data[new_node.size - 1].second, block_num + 1);
           //std::cout << new_node.first.key << new_node.first.pos << block_num + 1 << '\n';
           append_main(new_node);
+          data_list[block_num] = new_node;
         }
-        write_main(tmp, it);
       }
 
       void remove(K &k, V &v) {
         KV kv = {k, v};
         auto it = list.block_lower_bound(kv);
         if (it == 0) return;
-        DNode tmp;
-        read_main(tmp, it);
+        DNode &tmp = data_list[it];
 
         if (kv == tmp._data[tmp.size - 1]) {
           list.remove(k, v);
@@ -137,15 +142,13 @@ namespace arima_kana {
         }
         try { tmp.remove_pair(k, v); }
         catch (...) { return; }
-        write_main(tmp, it);
       }
 
       void find(const K &k) {
         bool flag = false;
         arima_kana::vector<size_t> tmp = list.find(k);
         for (int i = 0; i < tmp.size(); i++) {
-          DNode t;
-          read_main(t, tmp[i]);
+          DNode &t = data_list[tmp[i]];
           for (int j = 0; j < t.size; j++) {
             if (t._data[j].first == k) {
               std::cout << t._data[j].second << ' ';
@@ -159,9 +162,8 @@ namespace arima_kana {
 
       void print() {
         list.print();
-        DNode tmp;
         for (int i = 1; i <= block_num; i++) {
-          read_main(tmp, i);
+          DNode &tmp = data_list[i];
           std::cout << i << '\n';
           tmp.print();
         }
