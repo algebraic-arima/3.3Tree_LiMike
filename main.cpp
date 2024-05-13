@@ -38,7 +38,7 @@ void find_key(const std::set<arima_kana::pair<K, V>> &m, const K &k) {
 typedef arima_kana::m_string<69> mstr;
 
 int main() {
-  arima_kana::BlockRiver<mstr, int, 56> bp("fn");
+  arima_kana::BlockRiver<unsigned long long, int, 56> bp("fn");
 //  std::set<arima_kana::pair<mstr, int>> mp;
   mstr s;
   int n;
@@ -59,7 +59,7 @@ int main() {
       cin >> s;
       if (op == "insert") {
         cin >> val;
-        bp.insert(s, val);
+        bp.insert(hash(s), val);
 //        bp.map_print(bp.root);
 //        std::cout << '\n';
 //        mp.insert({s, val});
@@ -67,7 +67,7 @@ int main() {
 //        std::cout << '\n';
       } else if (op == "delete") {
         cin >> val;
-        bp.remove(s, val);
+        bp.remove(hash(s), val);
 //        bp.map_print(bp.root);
 //        std::cout << '\n';
 //        mp.erase({s, val});
@@ -75,7 +75,7 @@ int main() {
 //        std::cout << '\n';
       } else if (op == "find") {
 //        cin >> val;
-        bp.find(s);
+        bp.find(hash(s));
 //        find_key(mp, s);
       } else {
         continue;

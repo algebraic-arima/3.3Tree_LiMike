@@ -49,6 +49,15 @@ namespace arima_kana {
       return is;
     }
 
+    template<int length>
+    unsigned long long hash(const m_string<length> &key) {
+      unsigned long long h = 0;
+      for (int i = 0; i < length; i++) {
+        h = h * 233 + key.id[i];
+      }
+      return h;
+    }
+
     template<class T1, class T2>
     class pair {
     public:
