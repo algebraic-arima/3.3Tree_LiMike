@@ -20,7 +20,7 @@ namespace arima_kana {
 
       typedef pair<K, V> KV;
       typedef DataNode<K, V, block> DNode;
-      typedef BPTree<K, V, 30, 12> map;
+      typedef BPTree<K, V, 50, 20> map;
       typedef Buffer<DNode, size_t, 1, 50> buffer;
 
       size_t block_num = 0;
