@@ -6,8 +6,11 @@
 #include <fstream>
 
 namespace arima_kana {
-    template<class T, class pre, size_t num,size_t _cap>
+    template<class T, class pre, size_t num, size_t _cap>
     class Buffer {
+
+      static constexpr int SIZE_T = sizeof(T);
+      static constexpr int SIZE_PRE = sizeof(pre);
 
       struct Node {
         size_t pos;
@@ -19,15 +22,15 @@ namespace arima_kana {
 
       void read_node(T &dn, size_t pos) {
         file.open(name, std::ios::in | std::ios::out | std::ios::binary);
-        file.seekg(num * sizeof(pre) + (pos - 1) * sizeof(T));
-        file.read(reinterpret_cast<char *>(&dn), sizeof(T));
+        file.seekg(num * SIZE_PRE + (pos - 1) * SIZE_T);
+        file.read(reinterpret_cast<char *>(&dn), SIZE_T);
         file.close();
       }
 
       void write_node(T &dn, size_t pos) {
         file.open(name, std::ios::in | std::ios::out | std::ios::binary);
-        file.seekp(num * sizeof(pre) + (pos - 1) * sizeof(T));
-        file.write(reinterpret_cast<char *>(&dn), sizeof(T));
+        file.seekp(num * SIZE_PRE + (pos - 1) * SIZE_T);
+        file.write(reinterpret_cast<char *>(&dn), SIZE_T);
         file.close();
       }
 
@@ -47,7 +50,7 @@ namespace arima_kana {
         _size = 0;
       }
 
-      void clear(){
+      void clear() {
         Node *tmp = head->next;
         while (tmp != tail) {
           Node *tmp2 = tmp;

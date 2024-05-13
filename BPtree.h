@@ -19,14 +19,16 @@ namespace arima_kana {
       typedef pair<K, V> p;
 
       size_t vacant_pos() {
-        if (free_pos.empty()) {
-          list.push_back(Node());
-          return ++size;
-        } else {
-          size_t pos = free_pos.back();
-          free_pos.pop_back();
-          return pos;
-        }
+//        if (free_pos.empty()) {
+//          list.push_back(Node());
+//          return ++size;
+//        } else {
+//          size_t pos = free_pos.back();
+//          free_pos.pop_back();
+//          return pos;
+//        }
+        list.push_back(Node());
+        return ++size;
       }
 
       /// @divide_node
@@ -227,14 +229,14 @@ namespace arima_kana {
         list[par].remove_pair(list[l]._key[list[l]._size - 1].first, list[l]._key[list[l]._size - 1].second);
         list[r]._size += list[l]._size;
         list[l]._size = 0;
-        free_pos.push_back(l);
+//        free_pos.push_back(l);
         if (list[par]._size < min_size) {
           if (list[par]._par == 0) {
             if (list[par]._size == 1) {
               list[par]._size = 0;
               root = list[par]._chil[0];
               list[root]._par = 0;
-              free_pos.push_back(par);
+//              free_pos.push_back(par);
             }
           } else {
             l = prev_sp_sibling(par), r = next_sp_sibling(par);
@@ -286,13 +288,16 @@ namespace arima_kana {
 
     public:
 
+      static constexpr size_t SIZE_T = sizeof(size_t);
+      static constexpr size_t SIZE_NODE = sizeof(Node);
+
       size_t size = 0;
       size_t root = 0;// 0 means empty
       size_t free_num = 0;
       std::fstream index_filer;
       std::string index_file;
       arima_kana::vector<Node> list;
-      arima_kana::vector<size_t> free_pos;
+//      arima_kana::vector<size_t> free_pos;
 
       explicit BPTree(const std::string &ifn) : index_file(ifn + "_index") {
         index_filer.open(index_file, std::ios::in);
@@ -308,58 +313,58 @@ namespace arima_kana {
       /// the following 3 functions are used to modify list
       void init_list() {
         index_filer.open(index_file, std::ios::out);
-        index_filer.write(reinterpret_cast<char *>(&size), sizeof(size_t));
-        index_filer.write(reinterpret_cast<char *>(&root), sizeof(size_t));
-        index_filer.write(reinterpret_cast<char *>(&free_num), sizeof(size_t));
+        index_filer.write(reinterpret_cast<char *>(&size), SIZE_T);
+        index_filer.write(reinterpret_cast<char *>(&root), SIZE_T);
+        index_filer.write(reinterpret_cast<char *>(&free_num), SIZE_T);
         list.push_back(Node());
         index_filer.close();
       }
 
       void read_list() {
         index_filer.open(index_file, std::ios::in | std::ios::binary);
-        index_filer.read(reinterpret_cast<char *>(&size), sizeof(size_t));
-        index_filer.read(reinterpret_cast<char *>(&root), sizeof(size_t));
-        index_filer.read(reinterpret_cast<char *>(&free_num), sizeof(size_t));
+        index_filer.read(reinterpret_cast<char *>(&size), SIZE_T);
+        index_filer.read(reinterpret_cast<char *>(&root), SIZE_T);
+        index_filer.read(reinterpret_cast<char *>(&free_num), SIZE_T);
         Node tmp;
         list.push_back(tmp);
         for (int i = 0; i < size; i++) {
-          index_filer.read(reinterpret_cast<char *>(&tmp), sizeof(Node));
+          index_filer.read(reinterpret_cast<char *>(&tmp), SIZE_NODE);
           list.push_back(tmp);
         }
-        size_t tm;
-        for (int i = 0; i < free_num; i++) {
-          index_filer.read(reinterpret_cast<char *>(&tm), sizeof(size_t));
-          free_pos.push_back(tm);
-        }
+//        size_t tm;
+//        for (int i = 0; i < free_num; i++) {
+//          index_filer.read(reinterpret_cast<char *>(&tm), SIZE_T);
+//          free_pos.push_back(tm);
+//        }
         index_filer.close();
       }
 
       void write_list() {
         index_filer.open(index_file, std::ios::in | std::ios::out | std::ios::binary);
-        free_num = free_pos.size();
-        index_filer.write(reinterpret_cast<char *>(&size), sizeof(size_t));
-        index_filer.write(reinterpret_cast<char *>(&root), sizeof(size_t));
-        index_filer.write(reinterpret_cast<char *>(&free_num), sizeof(size_t));
+//        free_num = free_pos.size();
+        index_filer.write(reinterpret_cast<char *>(&size), SIZE_T);
+        index_filer.write(reinterpret_cast<char *>(&root), SIZE_T);
+        index_filer.write(reinterpret_cast<char *>(&free_num), SIZE_T);
         for (int i = 1; i < list.size(); i++) {
-          index_filer.write(reinterpret_cast<char *>(&list[i]), sizeof(Node));
+          index_filer.write(reinterpret_cast<char *>(&list[i]), SIZE_NODE);
         }
-        for (int i = 0; i < free_num; i++) {
-          index_filer.write(reinterpret_cast<char *>(&free_pos[i]), sizeof(size_t));
-        }
+//        for (int i = 0; i < free_num; i++) {
+//          index_filer.write(reinterpret_cast<char *>(&free_pos[i]), SIZE_T);
+//        }
         index_filer.close();
       }
 
       void read_node(Node &dn, size_t pos) {
         index_filer.open(index_file, std::ios::in | std::ios::binary);
-        index_filer.seekg(3 * sizeof(size_t) + (pos - 1) * sizeof(Node));
-        index_filer.read(reinterpret_cast<char *>(&dn), sizeof(Node));
+        index_filer.seekg(3 * SIZE_T + (pos - 1) * SIZE_NODE);
+        index_filer.read(reinterpret_cast<char *>(&dn), SIZE_NODE);
         index_filer.close();
       }
 
       void write_node(Node &dn, size_t pos) {
         index_filer.open(index_file, std::ios::in | std::ios::out | std::ios::binary);
-        index_filer.seekp(3 * sizeof(size_t) + (pos - 1) * sizeof(Node));
-        index_filer.write(reinterpret_cast<char *>(&dn), sizeof(Node));
+        index_filer.seekp(3 * SIZE_T + (pos - 1) * SIZE_NODE);
+        index_filer.write(reinterpret_cast<char *>(&dn), SIZE_NODE);
         index_filer.close();
       }
 
@@ -470,7 +475,7 @@ namespace arima_kana {
       void clear() {
         root = 0;
         size = 0;
-        free_pos.clear();
+//        free_pos.clear();
         free_num = 0;
         list.clear();
         index_filer.open(index_file, std::ios::out);
@@ -479,7 +484,8 @@ namespace arima_kana {
       }
 
       bool empty() {
-        return root == 0 || size == free_pos.size();
+        return root == 0 ;
+//        || size == free_pos.size();
       }
 
       void print() {

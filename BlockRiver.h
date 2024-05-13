@@ -23,6 +23,9 @@ namespace arima_kana {
       typedef BPTree<K, V, 200, 80> map;
       typedef Buffer<DNode, size_t, 1, 120> buffer;
 
+      static constexpr int SIZE_DNODE = sizeof(DNode);
+      static constexpr int SIZE_T = sizeof(size_t);
+
       size_t block_num = 0;
       std::fstream data_filer;
       std::string data_file;
@@ -45,7 +48,7 @@ namespace arima_kana {
 
       void write_data() {
         data_filer.open(data_file, std::ios::in | std::ios::out | std::ios::binary);
-        data_filer.write(reinterpret_cast<char *>(&block_num), sizeof(size_t));
+        data_filer.write(reinterpret_cast<char *>(&block_num), SIZE_T);
         data_filer.close();
       }
 
@@ -56,19 +59,19 @@ namespace arima_kana {
 
       void init_data() {
         data_filer.open(data_file, std::ios::out | std::ios::binary);
-        data_filer.write(reinterpret_cast<char *>(&block_num), sizeof(size_t));
+        data_filer.write(reinterpret_cast<char *>(&block_num), SIZE_T);
         data_filer.close();
       }
 
       void read_data() {
         data_filer.open(data_file, std::ios::in | std::ios::binary);
-        data_filer.read(reinterpret_cast<char *>(&block_num), sizeof(size_t));
+        data_filer.read(reinterpret_cast<char *>(&block_num), SIZE_T);
         data_filer.close();
       }
 
       void append_main(DNode &t) {
         data_filer.open(data_file, std::ios::app);
-        data_filer.write(reinterpret_cast<char *>(&t), sizeof(DNode));
+        data_filer.write(reinterpret_cast<char *>(&t), SIZE_DNODE);
         data_filer.close();
         ++block_num;
       }
@@ -76,16 +79,16 @@ namespace arima_kana {
       void write_main(DNode &t, const int pos) {
         if (pos > block_num) return;
         data_filer.open(data_file, std::ios::out | std::ios::in | std::ios::binary);
-        data_filer.seekp(sizeof(block_num) + (pos - 1) * sizeof(DNode));
-        data_filer.write(reinterpret_cast<char *> (&t), sizeof(DNode));
+        data_filer.seekp(sizeof(block_num) + (pos - 1) * SIZE_DNODE);
+        data_filer.write(reinterpret_cast<char *> (&t), SIZE_DNODE);
         data_filer.close();
       }
 
       void read_main(DNode &t, const int pos) {
         if (pos > block_num) return;
         data_filer.open(data_file, std::ios::in | std::ios::binary);
-        data_filer.seekg(sizeof(block_num) + (pos - 1) * sizeof(DNode));
-        data_filer.read(reinterpret_cast<char *> (&t), sizeof(DNode));
+        data_filer.seekg(sizeof(block_num) + (pos - 1) * SIZE_DNODE);
+        data_filer.read(reinterpret_cast<char *> (&t), SIZE_DNODE);
         data_filer.close();
       }
 
