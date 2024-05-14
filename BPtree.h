@@ -209,16 +209,15 @@ namespace arima_kana {
       /// @prev_sp_sibling
       /// returns the previous sibling in the same parent node
       size_t prev_sp_sibling(size_t pos) {
+        if (list[pos]._par == 0) return 0;
         size_t par = list[pos]._par;
-        if(par == 0) return 0;
         size_t i = 0;
-        Node &p = list[par];
-        while (i < p._size - 1 && p._chil[i] != pos) ++i;
+        while (i < list[par]._size - 1 && list[par]._chil[i] != pos) ++i;
         if (i == 0) {
           return 0;
         }
         --i;
-        pos = p._chil[i];
+        pos = list[par]._chil[i];
         return pos;
       }
 
