@@ -116,7 +116,7 @@ namespace arima_kana {
           size_t i = node.lower_bound(kv);
           if (i == node._size) return 0;
           pos = node._chil[i];
-          node = list[pos];
+          &node = list[pos];
         }
         return pos;
       }
