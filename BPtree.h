@@ -111,10 +111,12 @@ namespace arima_kana {
       /// in the leaf node layer
       size_t list_lower_bound(const p &kv) {
         size_t pos = root;
-        while (!list[pos].is_leaf) {
-          size_t i = list[pos].lower_bound(kv);
-          if (i == list[pos]._size) return 0;
-          pos = list[pos]._chil[i];
+        Node &node = list[pos];
+        while (!node.is_leaf) {
+          size_t i = node.lower_bound(kv);
+          if (i == node._size) return 0;
+          pos = node._chil[i];
+          node = list[pos];
         }
         return pos;
       }
