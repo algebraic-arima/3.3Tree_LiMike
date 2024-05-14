@@ -108,33 +108,53 @@ namespace arima_kana {
     template<class T1, class T2>
     pair(T1, T2) -> pair<T1, T2>;
 
+    template<typename T>
+    struct Allocator {
+      T *allocate(size_t size) {
+        return (T *) malloc(sizeof(T) * size);
+      }
 
-    template<class T>
+      void deallocate(void *p) {
+        free(p);
+      }
+
+      void construct(T *p, const T &val) {
+        new(p) T(val);
+      }
+
+      void destroy(T *p) {
+        p->~T();
+      }
+    };
+
+    template<class T, class _alloc=Allocator<T>>
     class vector {
       T *data;
       size_t _size;
       size_t _capacity;
+      _alloc alloc;
 
       void double_space() {
         _capacity *= 2;
-        T *tmp = new T[_capacity];
+        T *tmp = alloc.allocate(_capacity);
         for (size_t i = 0; i < _size; i++) {
-          tmp[i] = data[i];
+          alloc.construct(tmp + i, data[i]);
         }
-        delete[] data;
+        alloc.deallocate(data);
         data = tmp;
       }
 
     public:
       vector(size_t cap = 10) : _size(0), _capacity(cap) {
-        data = new T[_capacity];
+        data = alloc.allocate(_capacity);
       }
 
       void push_back(const T &val) {
         if (_size == _capacity) {
           double_space();
         }
-        data[_size++] = val;
+        alloc.construct(data + _size, val);
+        _size++;
       }
 
       size_t size() const {
@@ -158,27 +178,36 @@ namespace arima_kana {
       }
 
       void pop_back() {
-        if (_size != 0) _size--;
-        if (_size < _capacity / 3) {
-          _capacity /= 2;
-          T *tmp = new T[_capacity];
-          for (size_t i = 0; i < _size; i++) {
-            tmp[i] = data[i];
-          }
-          delete[] data;
-          data = tmp;
+        if (_size != 0) {
+          alloc.destroy(data + _size - 1);
+          _size--;
         }
+//        if (_size < _capacity / 3) {
+//          _capacity /= 2;
+//          T *tmp = new T[_capacity];
+//          for (size_t i = 0; i < _size; i++) {
+//            tmp[i] = data[i];
+//          }
+//          delete[] data;
+//          data = tmp;
+//        }
       }
 
       void clear() {
-        delete[] data;
+        for(size_t i = 0; i < _size; i++) {
+          alloc.destroy(data + i);
+        }
+        alloc.deallocate(data);
         _size = 0;
         _capacity = 10;
-        data = new T[_capacity];
+        data = alloc.allocate(_capacity);
       }
 
       ~vector() {
-        delete[] data;
+        for(size_t i = 0; i < _size; i++) {
+          alloc.destroy(data + i);
+        }
+        alloc.deallocate(data);
       }
 
     };
