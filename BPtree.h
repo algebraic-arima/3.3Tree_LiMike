@@ -111,12 +111,10 @@ namespace arima_kana {
       /// in the leaf node layer
       size_t list_lower_bound(const p &kv) {
         size_t pos = root;
-        Node &node = list[pos];
-        while (!node.is_leaf) {
-          size_t i = node.lower_bound(kv);
-          if (i == node._size) return 0;
-          pos = node._chil[i];
-          node = list[pos];
+        while (!list[pos].is_leaf) {
+          size_t i = list[pos].lower_bound(kv);
+          if (i == list[pos]._size) return 0;
+          pos = list[pos]._chil[i];
         }
         return pos;
       }
@@ -124,12 +122,10 @@ namespace arima_kana {
       size_t lower_bound(const K &k) {
         size_t pos = root;
         if (root == 0) return 0;
-        Node &node = list[pos];
-        while (!node.is_leaf) {
-          size_t i = node.lower_bound(k);
-          if (i == node._size) --i;
-          pos = node._chil[i];
-          node = list[pos];
+        while (!list[pos].is_leaf) {
+          size_t i = list[pos].lower_bound(k);
+          if (i == list[pos]._size) --i;
+          pos = list[pos]._chil[i];
         }
         return pos;
       }
@@ -137,12 +133,10 @@ namespace arima_kana {
       size_t upper_bound(const K &k) {
         size_t pos = root;
         if (root == 0) return 0;
-        Node &node = list[pos];
-        while (!node.is_leaf) {
-          size_t i = node.upper_bound(k);
-          if (i == node._size) --i;
-          pos = node._chil[i];
-          node = list[pos];
+        while (!list[pos].is_leaf) {
+          size_t i = list[pos].upper_bound(k);
+          if (i == list[pos]._size) --i;
+          pos = list[pos]._chil[i];
         }
         return pos;
       }
