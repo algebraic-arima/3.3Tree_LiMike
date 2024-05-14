@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <cstring>
+#include <memory>
 
 namespace arima_kana {
 
@@ -127,7 +128,7 @@ namespace arima_kana {
       }
     };
 
-    template<class T, class _alloc=Allocator<T>>
+    template<class T, class _alloc=std::allocator<T>>
     class vector {
       T *data;
       size_t _size;
@@ -140,7 +141,7 @@ namespace arima_kana {
         for (size_t i = 0; i < _size; i++) {
           alloc.construct(tmp + i, data[i]);
         }
-        alloc.deallocate(data);
+        alloc.deallocate(data, _capacity / 2);
         data = tmp;
       }
 
@@ -194,20 +195,20 @@ namespace arima_kana {
       }
 
       void clear() {
-        for(size_t i = 0; i < _size; i++) {
+        for (size_t i = 0; i < _size; i++) {
           alloc.destroy(data + i);
         }
-        alloc.deallocate(data);
+        alloc.deallocate(data, _capacity);
         _size = 0;
         _capacity = 10;
         data = alloc.allocate(_capacity);
       }
 
       ~vector() {
-        for(size_t i = 0; i < _size; i++) {
+        for (size_t i = 0; i < _size; i++) {
           alloc.destroy(data + i);
         }
-        alloc.deallocate(data);
+        alloc.deallocate(data, _capacity);
       }
 
     };
