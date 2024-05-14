@@ -111,10 +111,12 @@ namespace arima_kana {
       /// in the leaf node layer
       size_t list_lower_bound(const p &kv) {
         size_t pos = root;
-        while (!list[pos].is_leaf) {
-          size_t i = list[pos].lower_bound(kv);
-          if (i == list[pos]._size) return 0;
-          pos = list[pos]._chil[i];
+        Node &node = list[pos];
+        while (!node.is_leaf) {
+          size_t i = node.lower_bound(kv);
+          if (i == node._size) return 0;
+          pos = node._chil[i];
+          node = list[pos];
         }
         return pos;
       }
@@ -122,10 +124,12 @@ namespace arima_kana {
       size_t lower_bound(const K &k) {
         size_t pos = root;
         if (root == 0) return 0;
-        while (!list[pos].is_leaf) {
-          size_t i = list[pos].lower_bound(k);
-          if (i == list[pos]._size) --i;
-          pos = list[pos]._chil[i];
+        Node &node = list[pos];
+        while (!node.is_leaf) {
+          size_t i = node.lower_bound(k);
+          if (i == node._size) --i;
+          pos = node._chil[i];
+          node = list[pos];
         }
         return pos;
       }
@@ -133,10 +137,12 @@ namespace arima_kana {
       size_t upper_bound(const K &k) {
         size_t pos = root;
         if (root == 0) return 0;
-        while (!list[pos].is_leaf) {
-          size_t i = list[pos].upper_bound(k);
-          if (i == list[pos]._size) --i;
-          pos = list[pos]._chil[i];
+        Node &node = list[pos];
+        while (!node.is_leaf) {
+          size_t i = node.upper_bound(k);
+          if (i == node._size) --i;
+          pos = node._chil[i];
+          node = list[pos];
         }
         return pos;
       }
@@ -203,38 +209,41 @@ namespace arima_kana {
       /// @prev_sp_sibling
       /// returns the previous sibling in the same parent node
       size_t prev_sp_sibling(size_t pos) {
-        if (list[pos]._par == 0) return 0;
         size_t par = list[pos]._par;
+        if(par == 0) return 0;
         size_t i = 0;
-        while (i < list[par]._size - 1 && list[par]._chil[i] != pos) ++i;
+        Node &p = list[par];
+        while (i < p._size - 1 && p._chil[i] != pos) ++i;
         if (i == 0) {
           return 0;
         }
         --i;
-        pos = list[par]._chil[i];
+        pos = p._chil[i];
         return pos;
       }
 
       void merge(size_t l, size_t r) {
-        size_t par = list[l]._par;
-        for (int j = list[r]._size - 1; j >= 0; j--) {
-          list[r]._key[j + list[l]._size] = list[r]._key[j];
-          list[r]._chil[j + list[l]._size] = list[r]._chil[j];
+        Node &l_n= list[l], &r_n = list[r];
+        size_t par = l_n._par;
+        Node &p_n = list[par];
+        for (int j = r_n._size - 1; j >= 0; j--) {
+          r_n._key[j + l_n._size] = r_n._key[j];
+          r_n._chil[j + l_n._size] = r_n._chil[j];
         }
-        for (int j = 0; j < list[l]._size; j++) {
-          list[r]._key[j] = list[l]._key[j];
-          list[r]._chil[j] = list[l]._chil[j];
-          if (!list[r].is_leaf) list[list[r]._chil[j]]._par = r;
+        for (int j = 0; j < l_n._size; j++) {
+          r_n._key[j] = l_n._key[j];
+          r_n._chil[j] = l_n._chil[j];
+          if (!r_n.is_leaf) list[r_n._chil[j]]._par = r;
         }
-        list[par].remove_pair(list[l]._key[list[l]._size - 1].first, list[l]._key[list[l]._size - 1].second);
-        list[r]._size += list[l]._size;
-        list[l]._size = 0;
+        p_n.remove_pair(l_n._key[l_n._size - 1].first, l_n._key[l_n._size - 1].second);
+        r_n._size += l_n._size;
+        l_n._size = 0;
 //        free_pos.push_back(l);
-        if (list[par]._size < min_size) {
-          if (list[par]._par == 0) {
-            if (list[par]._size == 1) {
-              list[par]._size = 0;
-              root = list[par]._chil[0];
+        if (p_n._size < min_size) {
+          if (p_n._par == 0) {
+            if (p_n._size == 1) {
+              p_n._size = 0;
+              root = p_n._chil[0];
               list[root]._par = 0;
 //              free_pos.push_back(par);
             }
@@ -252,38 +261,40 @@ namespace arima_kana {
       }
 
       void borrow_from_left(size_t l, size_t r) {
-        size_t par = list[l]._par;
-        size_t bor_num = (list[l]._size - list[r]._size) / 2;
-        size_t bor_st = list[l]._size - bor_num;
-        for (int j = list[r]._size - 1; j >= 0; j--) {
-          list[r]._key[j + bor_num] = list[r]._key[j];
-          list[r]._chil[j + bor_num] = list[r]._chil[j];
+        Node &l_n = list[l], &r_n = list[r];
+        size_t par = l_n._par;
+        size_t bor_num = (l_n._size - r_n._size) / 2;
+        size_t bor_st = l_n._size - bor_num;
+        for (int j = r_n._size - 1; j >= 0; j--) {
+          r_n._key[j + bor_num] = r_n._key[j];
+          r_n._chil[j + bor_num] = r_n._chil[j];
         }
         for (int j = 0; j < bor_num; j++) {
-          list[r]._key[j] = list[l]._key[j + bor_st];
-          list[r]._chil[j] = list[l]._chil[j + bor_st];
-          if (!list[r].is_leaf) list[list[r]._chil[j]]._par = r;
+          r_n._key[j] = l_n._key[j + bor_st];
+          r_n._chil[j] = l_n._chil[j + bor_st];
+          if (!r_n.is_leaf) list[r_n._chil[j]]._par = r;
         }
-        list[l]._size -= bor_num;
-        list[r]._size += bor_num;
-        list[par].modify_pair(list[r]._key[bor_num - 1], list[l]._key[list[l]._size - 1]);
+        l_n._size -= bor_num;
+        r_n._size += bor_num;
+        list[par].modify_pair(r_n._key[bor_num - 1], l_n._key[l_n._size - 1]);
       }
 
       void borrow_from_right(size_t l, size_t r) {
-        size_t par = list[l]._par;
-        size_t bor_num = (list[r]._size - list[l]._size) / 2;
+        Node &l_n = list[l], &r_n = list[r];
+        size_t par = l_n._par;
+        size_t bor_num = (r_n._size - l_n._size) / 2;
         for (int j = 0; j < bor_num; j++) {
-          list[l]._key[list[l]._size + j] = list[r]._key[j];
-          list[l]._chil[list[l]._size + j] = list[r]._chil[j];
-          if (!list[l].is_leaf) list[list[r]._chil[j]]._par = l;
+          l_n._key[l_n._size + j] = r_n._key[j];
+          l_n._chil[l_n._size + j] = r_n._chil[j];
+          if (!l_n.is_leaf) list[r_n._chil[j]]._par = l;
         }
-        for (int j = 0; j < list[r]._size - bor_num; j++) {
-          list[r]._key[j] = list[r]._key[j + bor_num];
-          list[r]._chil[j] = list[r]._chil[j + bor_num];
+        for (int j = 0; j < r_n._size - bor_num; j++) {
+          r_n._key[j] = r_n._key[j + bor_num];
+          r_n._chil[j] = r_n._chil[j + bor_num];
         }
-        list[r]._size -= bor_num;
-        list[l]._size += bor_num;
-        list[par].modify_pair(list[l]._key[list[l]._size - bor_num - 1], list[l]._key[list[l]._size - 1]);
+        r_n._size -= bor_num;
+        l_n._size += bor_num;
+        list[par].modify_pair(l_n._key[l_n._size - bor_num - 1], l_n._key[l_n._size - 1]);
       }
 
     public:

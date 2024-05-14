@@ -110,7 +110,7 @@ namespace arima_kana {
     pair(T1, T2) -> pair<T1, T2>;
 
     template<typename T>
-    struct Allocator {
+    struct allocator {
       T *allocate(size_t size) {
         return (T *) malloc(sizeof(T) * size);
       }
