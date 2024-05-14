@@ -109,6 +109,53 @@ namespace arima_kana {
       }
 
     };
+
+    template<class T, class pre, size_t num>
+    class Table_Buffer {
+      static constexpr int SIZE_T = sizeof(T);
+      static constexpr int SIZE_PRE = sizeof(pre);
+
+      void read_node(T &dn, size_t pos) {
+        file.open(name, std::ios::in | std::ios::out | std::ios::binary);
+        file.seekg(num * SIZE_PRE + (pos - 1) * SIZE_T);
+        file.read(reinterpret_cast<char *>(&dn), SIZE_T);
+        file.close();
+      }
+
+      void write_node(T &dn, size_t pos) {
+        file.open(name, std::ios::in | std::ios::out | std::ios::binary);
+        file.seekp(num * SIZE_PRE + (pos - 1) * SIZE_T);
+        file.write(reinterpret_cast<char *>(&dn), SIZE_T);
+        file.close();
+      }
+
+      vector<T *> table;
+      std::fstream file;
+      std::string name;
+
+      explicit Table_Buffer(const std::string &fn, size_t c) : table(c) {
+        name = fn;
+      }
+
+      ~Table_Buffer() {
+        for (size_t i = 0; i < table.size(); ++i){
+          if (table[i] != nullptr) {
+            write_node(*table[i], i);
+            delete table[i];
+            table[i] = nullptr;
+          }
+        }
+      }
+
+      T &operator[](size_t pos) {
+        if (table[pos] == nullptr) {
+          table[pos] = new T();
+          read_node(*table[pos], pos);
+        }
+        return *table[pos];
+      }
+
+    };
 }
 
 #endif //BPTREE_BUFFER_H
