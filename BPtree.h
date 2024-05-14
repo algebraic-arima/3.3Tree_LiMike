@@ -93,8 +93,9 @@ namespace arima_kana {
       /// if the maximum is the old_kv
       void subs(size_t pos, const p &old_kv, const p &new_kv) {
         Node &node = list[pos];
-        size_t i = 0;
-        while (i < node._size && node._key[i] < old_kv) ++i;
+        size_t i = node.lower_bound(old_kv);
+        /// first element that >= old_kv
+//        while (i < node._size && node._key[i] < old_kv) ++i;///binary search
         if (node._key[i] != old_kv) {
           error("Key-value pair not found");
         }
@@ -151,7 +152,7 @@ namespace arima_kana {
         if (list[pos]._par == 0) return 0;
         size_t par = list[pos]._par;
         size_t i = list[par]._size - 1;
-        while (i > 0 && list[par]._chil[i] != pos) --i;
+        while (i > 0 && list[par]._chil[i] != pos) --i;///binary search
         int cnt = 0;
         while (i == list[par]._size - 1) {
           pos = list[pos]._par;
@@ -159,7 +160,7 @@ namespace arima_kana {
           if (list[par]._par == 0) return 0;// no next sibling
           par = list[par]._par;
           i = list[par]._size - 1;
-          while (i > 0 && list[par]._chil[i] != pos) --i;
+          while (i > 0 && list[par]._chil[i] != pos) --i;///binary search
         }
         ++i;
         pos = list[par]._chil[i];
@@ -173,7 +174,7 @@ namespace arima_kana {
         if (list[pos]._par == 0) return 0;
         size_t par = list[pos]._par;
         size_t i = 0;
-        while (i < list[par]._size - 1 && list[par]._chil[i] != pos) ++i;
+        while (i < list[par]._size - 1 && list[par]._chil[i] != pos) ++i;///binary search
         int cnt = 0;
         while (i == 0) {
           pos = list[pos]._par;
@@ -181,7 +182,7 @@ namespace arima_kana {
           if (list[par]._par == 0) return 0;// no next sibling
           par = list[par]._par;
           i = 0;
-          while (i < list[par]._size - 1 && list[par]._chil[i] != pos) ++i;
+          while (i < list[par]._size - 1 && list[par]._chil[i] != pos) ++i;///binary search
         }
         --i;
         pos = list[par]._chil[i];
@@ -197,7 +198,7 @@ namespace arima_kana {
         if (list[pos]._par == 0) return 0;
         size_t par = list[pos]._par;
         size_t i = list[par]._size - 1;
-        while (i > 0 && list[par]._chil[i] != pos) --i;
+        while (i > 0 && list[par]._chil[i] != pos) --i;///binary search
         if (i == list[par]._size - 1) {
           return 0;
         }
@@ -212,7 +213,7 @@ namespace arima_kana {
         if (list[pos]._par == 0) return 0;
         size_t par = list[pos]._par;
         size_t i = 0;
-        while (i < list[par]._size - 1 && list[par]._chil[i] != pos) ++i;
+        while (i < list[par]._size - 1 && list[par]._chil[i] != pos) ++i;///binary search
         if (i == 0) {
           return 0;
         }
