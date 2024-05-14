@@ -125,7 +125,7 @@ namespace arima_kana {
       size_t lower_bound(const K &k) {
         if (root == 0) return 0;
         size_t pos = root;
-        Node* node = &list[pos];
+        Node *node = &list[pos];
         while (!node->is_leaf) {
           size_t i = node->lower_bound(k);
           if (i == node->_size) --i;
@@ -138,7 +138,7 @@ namespace arima_kana {
       size_t upper_bound(const K &k) {
         if (root == 0) return 0;
         size_t pos = root;
-        Node* node = &list[pos];
+        Node *node = &list[pos];
         while (!node->is_leaf) {
           size_t i = node->upper_bound(k);
           if (i == node->_size) --i;
@@ -151,8 +151,9 @@ namespace arima_kana {
       size_t next_sibling(size_t pos) {
         if (list[pos]._par == 0) return 0;
         size_t par = list[pos]._par;
-        size_t i = list[par]._size - 1;
-        while (i > 0 && list[par]._chil[i] != pos) --i;///binary search
+//        size_t i = list[par]._size - 1;
+        size_t i = list[par].lower_bound(list[pos]._key[list[pos]._size - 1]);
+//        while (i > 0 && list[par]._chil[i] != pos) --i;///binary search
         int cnt = 0;
         while (i == list[par]._size - 1) {
           pos = list[pos]._par;
@@ -491,7 +492,7 @@ namespace arima_kana {
       }
 
       bool empty() {
-        return root == 0 ;
+        return root == 0;
 //        || size == free_pos.size();
       }
 
