@@ -160,8 +160,8 @@ namespace arima_kana {
           ++cnt;
           if (list[par]._par == 0) return 0;// no next sibling
           par = list[par]._par;
-          i = list[par]._size - 1;
-          while (i > 0 && list[par]._chil[i] != pos) --i;///binary search
+          i = list[par].lower_bound(list[pos]._key[list[pos]._size - 1]);
+//          while (i > 0 && list[par]._chil[i] != pos) --i;///binary search
         }
         ++i;
         pos = list[par]._chil[i];
@@ -174,16 +174,16 @@ namespace arima_kana {
       size_t prev_sibling(size_t pos) {
         if (list[pos]._par == 0) return 0;
         size_t par = list[pos]._par;
-        size_t i = 0;
-        while (i < list[par]._size - 1 && list[par]._chil[i] != pos) ++i;///binary search
+        size_t i = list[par].lower_bound(list[pos]._key[list[pos]._size - 1]);
+//        while (i < list[par]._size - 1 && list[par]._chil[i] != pos) ++i;///binary search
         int cnt = 0;
         while (i == 0) {
           pos = list[pos]._par;
           ++cnt;
           if (list[par]._par == 0) return 0;// no next sibling
           par = list[par]._par;
-          i = 0;
-          while (i < list[par]._size - 1 && list[par]._chil[i] != pos) ++i;///binary search
+          i = list[par].lower_bound(list[pos]._key[list[pos]._size - 1]);
+//          while (i < list[par]._size - 1 && list[par]._chil[i] != pos) ++i;///binary search
         }
         --i;
         pos = list[par]._chil[i];
@@ -198,8 +198,8 @@ namespace arima_kana {
       size_t next_sp_sibling(size_t pos) {
         if (list[pos]._par == 0) return 0;
         size_t par = list[pos]._par;
-        size_t i = list[par]._size - 1;
-        while (i > 0 && list[par]._chil[i] != pos) --i;///binary search
+        size_t i = list[par].lower_bound(list[pos]._key[list[pos]._size - 1]);
+//        while (i > 0 && list[par]._chil[i] != pos) --i;///binary search
         if (i == list[par]._size - 1) {
           return 0;
         }
@@ -213,8 +213,8 @@ namespace arima_kana {
       size_t prev_sp_sibling(size_t pos) {
         if (list[pos]._par == 0) return 0;
         size_t par = list[pos]._par;
-        size_t i = 0;
-        while (i < list[par]._size - 1 && list[par]._chil[i] != pos) ++i;///binary search
+        size_t i = list[par].lower_bound(list[pos]._key[list[pos]._size - 1]);
+//        while (i < list[par]._size - 1 && list[par]._chil[i] != pos) ++i;///binary search
         if (i == 0) {
           return 0;
         }
