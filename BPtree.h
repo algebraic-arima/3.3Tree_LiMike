@@ -11,6 +11,7 @@
 #include "error.h"
 #include "BNode.h"
 #include "utility.h"
+#include "Buffer.h"
 
 namespace arima_kana {
     template<class K, class V, size_t degree, size_t min_size>
@@ -304,10 +305,12 @@ namespace arima_kana {
       size_t free_num = 0;
       std::fstream index_filer;
       std::string index_file;
-      arima_kana::vector<Node> list;
+      arima_kana::Table_Buffer<Node, size_t, 3> list;
 //      arima_kana::vector<size_t> free_pos;
 
-      explicit BPTree(const std::string &ifn) : index_file(ifn + "_index") {
+      explicit BPTree(const std::string &ifn) :
+              index_file(ifn + "_index"),
+              list(ifn + "_index") {
         index_filer.open(index_file, std::ios::in);
         if (!index_filer.is_open()) {
           index_filer.close();
@@ -333,12 +336,13 @@ namespace arima_kana {
         index_filer.read(reinterpret_cast<char *>(&size), SIZE_T);
         index_filer.read(reinterpret_cast<char *>(&root), SIZE_T);
         index_filer.read(reinterpret_cast<char *>(&free_num), SIZE_T);
-        Node tmp;
-        list.push_back(tmp);
-        for (int i = 0; i < size; i++) {
-          index_filer.read(reinterpret_cast<char *>(&tmp), SIZE_NODE);
-          list.push_back(tmp);
-        }
+//        Node tmp;
+//        list.push_back(tmp);
+//        for (int i = 0; i < size; i++) {
+//          index_filer.read(reinterpret_cast<char *>(&tmp), SIZE_NODE);
+//          list.push_back(tmp);
+//        }
+        list.resize(size + 1);
 //        size_t tm;
 //        for (int i = 0; i < free_num; i++) {
 //          index_filer.read(reinterpret_cast<char *>(&tm), SIZE_T);
@@ -353,9 +357,9 @@ namespace arima_kana {
         index_filer.write(reinterpret_cast<char *>(&size), SIZE_T);
         index_filer.write(reinterpret_cast<char *>(&root), SIZE_T);
         index_filer.write(reinterpret_cast<char *>(&free_num), SIZE_T);
-        for (int i = 1; i < list.size(); i++) {
-          index_filer.write(reinterpret_cast<char *>(&list[i]), SIZE_NODE);
-        }
+//        for (int i = 1; i < list.size(); i++) {
+//          index_filer.write(reinterpret_cast<char *>(&list[i]), SIZE_NODE);
+//        }
 //        for (int i = 0; i < free_num; i++) {
 //          index_filer.write(reinterpret_cast<char *>(&free_pos[i]), SIZE_T);
 //        }

@@ -129,30 +129,51 @@ namespace arima_kana {
         file.close();
       }
 
-      vector<T *> table;
+      struct Node {
+        T data;
+        bool dirty;
+      };
+
+
+      vector<Node> table;
       std::fstream file;
       std::string name;
+    public:
 
-      explicit Table_Buffer(const std::string &fn, size_t c) : table(c) {
+      explicit Table_Buffer(const std::string &fn) : table() {
         name = fn;
       }
 
       ~Table_Buffer() {
-        for (size_t i = 0; i < table.size(); ++i){
-          if (table[i] != nullptr) {
-            write_node(*table[i], i);
-            delete table[i];
-            table[i] = nullptr;
+        for (size_t i = 0; i < table.size(); ++i) {
+          if (table[i].dirty) {
+            write_node(table[i].data, i);
+            table[i].dirty = false;
           }
         }
       }
 
+      void clear() {
+        table.clear();
+      }
+
       T &operator[](size_t pos) {
-        if (table[pos] == nullptr) {
-          table[pos] = new T();
-          read_node(*table[pos], pos);
+        if (!table[pos].dirty) {
+          read_node(table[pos].data, pos);
+          table[pos].dirty = true;
         }
-        return *table[pos];
+        return table[pos].data;
+      }
+
+      void push_back(const T &val) {
+        table.push_back({val, true});
+      }
+
+      void resize(size_t size) {
+        table.resize(size);
+        for (size_t i = 0; i < size; ++i) {
+          table[i].dirty = false;
+        }
       }
 
     };
