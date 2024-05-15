@@ -183,32 +183,37 @@ namespace arima_kana {
       static constexpr int SIZE_T = sizeof(size_t);
       static constexpr int SIZE_PRE = sizeof(size_t);
 
-      std::map<size_t, T> table;
+      std::map<size_t, size_t> m;
+      vector<T> table;
 
     public:
-      Map_Buffer(const std::string &fn) : Buffer<T, pre, num>(fn) {}
+      Map_Buffer(const std::string &fn) :
+              Buffer<T, pre, num>(fn),
+              table() {}
 
       T &operator[](size_t pos) {
-        if (table.find(pos) == table.end()) {
+        if (m.find(pos) == m.end()) {
           T tmp;
           this->read_node(tmp, pos);
-          table[pos] = tmp;
-          if (table.size() > cap) {
-            auto it = table.begin();
-            this->write_node(it->second, it->first);
-            table.erase(it);
+          m[pos] = table.size();
+          table.push_back(tmp);
+          if (m.size() > cap) {
+            auto it = m.begin();
+            this->write_node(table[it->second], it->first);
+            m.erase(it);
           }
         }
-        return table[pos];
+        return table[m[pos]];
       }
 
       void clear() {
         table.clear();
+        m.clear();
       }
 
       ~Map_Buffer() {
-        for (auto &i: table) {
-          this->write_node(i.second, i.first);
+        for (auto &i: m) {
+          this->write_node(table[i.second], i.first);
         }
       }
     };
