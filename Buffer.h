@@ -4,7 +4,7 @@
 
 #include <iostream>
 #include <fstream>
-#include <map>
+#include "map.h"
 
 namespace arima_kana {
     template<class T, class pre, size_t num>
@@ -183,7 +183,7 @@ namespace arima_kana {
       static constexpr int SIZE_T = sizeof(size_t);
       static constexpr int SIZE_PRE = sizeof(size_t);
 
-      std::map<size_t, size_t> m;
+      map<size_t, size_t> m;
       vector<T> table;
 
     public:
