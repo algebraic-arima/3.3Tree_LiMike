@@ -692,24 +692,7 @@ namespace arima_kana {
 
 
     public:
-      /**
-       * Returns the number of elements with key
-       *   that compares equivalent to the specified argument,
-       *   which is either 1 or 0
-       *     since this container does not allow duplicates.
-       * The default method of check the equivalence is !(a < b || b > a)
-       */
-      size_t count(const Key &key) const {
-        return find_ptr(key) == nullptr ? 0 : 1;
-      }
 
-
-      /**
-       * Finds an element with key equivalent to key.
-       * key value of the element to search for.
-       * Iterator to an element with key equivalent to key.
-       *   If no such element is found, past-the-end (see end()) iterator is returned.
-       */
       iterator find(const Key &key) {
         return iterator(this, find_ptr(key));
       }
