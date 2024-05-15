@@ -205,6 +205,12 @@ namespace arima_kana {
       void clear() {
         table.clear();
       }
+
+      ~Map_Buffer() {
+        for (auto &i: table) {
+          this->write_node(i.second, i.first);
+        }
+      }
     };
 }
 
