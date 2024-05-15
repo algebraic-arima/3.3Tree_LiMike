@@ -4,22 +4,15 @@
 
 #include <iostream>
 #include <fstream>
+#include <map>
 
 namespace arima_kana {
-    template<class T, class pre, size_t num, size_t _cap>
+    template<class T, class pre, size_t num>
     class Buffer {
-
       static constexpr int SIZE_T = sizeof(T);
       static constexpr int SIZE_PRE = sizeof(pre);
 
-      struct Node {
-        size_t pos;
-        T data;
-        T copy;
-        Node *next;
-        Node *prev;
-      };
-
+    public:
       void read_node(T &dn, size_t pos) {
         file.open(name, std::ios::in | std::ios::out | std::ios::binary);
         file.seekg(num * SIZE_PRE + (pos - 1) * SIZE_T);
@@ -34,15 +27,40 @@ namespace arima_kana {
         file.close();
       }
 
-      Node *head;
-      Node *tail;
-      size_t _size;
+      virtual T &operator[](size_t pos) = 0;
+
+      virtual void clear() = 0;
+
+
       std::fstream file;
       std::string name;
     public:
+      Buffer(const std::string &fn) : name(fn) {}
 
-      Buffer(const std::string &fn) {
-        name = fn;
+    };
+
+
+    template<class T, class pre, size_t num, size_t _cap>
+    class List_Buffer : public Buffer<T, pre, num> {
+
+      static constexpr int SIZE_T = sizeof(T);
+      static constexpr int SIZE_PRE = sizeof(pre);
+
+      struct Node {
+        size_t pos;
+        T data;
+        T copy;
+        Node *next;
+        Node *prev;
+      };
+
+
+      Node *head;
+      Node *tail;
+      size_t _size;
+    public:
+
+      List_Buffer(const std::string &fn) : Buffer<T, pre, num>(fn) {
         head = new Node();
         tail = new Node();
         head->next = tail;
@@ -62,12 +80,12 @@ namespace arima_kana {
         _size = 0;
       }
 
-      ~Buffer() {
+      ~List_Buffer() {
 //        std::cout << "~Buffer\n";
         Node *tmp = head->next;
         while (tmp != tail) {
           if (!(tmp->data == tmp->copy))
-            write_node(tmp->data, tmp->pos);
+            this->write_node(tmp->data, tmp->pos);
           Node *tmp2 = tmp;
           tmp = tmp->next;
           delete tmp2;
@@ -91,7 +109,7 @@ namespace arima_kana {
           tmp = tmp->next;
         }
         Node *new_n = new Node{pos, T(), T(), head->next, head};
-        read_node(new_n->data, pos);
+        this->read_node(new_n->data, pos);
         new_n->copy = new_n->data;
         head->next->prev = new_n;
         head->next = new_n;
@@ -101,7 +119,7 @@ namespace arima_kana {
           tmp->prev->next = tail;
           tail->prev = tmp->prev;
           if (!(tmp->data == tmp->copy))
-            write_node(tmp->data, tmp->pos);
+            this->write_node(tmp->data, tmp->pos);
           delete tmp;
           --_size;
         }
@@ -111,23 +129,9 @@ namespace arima_kana {
     };
 
     template<class T, class pre, size_t num>
-    class Table_Buffer {
+    class Table_Buffer : public Buffer<T, pre, num> {
       static constexpr int SIZE_T = sizeof(T);
       static constexpr int SIZE_PRE = sizeof(pre);
-
-      void read_node(T &dn, size_t pos) {
-        file.open(name, std::ios::in | std::ios::out | std::ios::binary);
-        file.seekg(num * SIZE_PRE + (pos - 1) * SIZE_T);
-        file.read(reinterpret_cast<char *>(&dn), SIZE_T);
-        file.close();
-      }
-
-      void write_node(T &dn, size_t pos) {
-        file.open(name, std::ios::in | std::ios::out | std::ios::binary);
-        file.seekp(num * SIZE_PRE + (pos - 1) * SIZE_T);
-        file.write(reinterpret_cast<char *>(&dn), SIZE_T);
-        file.close();
-      }
 
       struct Node {
         T data;
@@ -136,18 +140,14 @@ namespace arima_kana {
 
 
       vector<Node> table;
-      std::fstream file;
-      std::string name;
     public:
 
-      explicit Table_Buffer(const std::string &fn) : table() {
-        name = fn;
-      }
+      explicit Table_Buffer(const std::string &fn) : table(), Buffer<T, pre, num>(fn) {}
 
       ~Table_Buffer() {
         for (size_t i = 0; i < table.size(); ++i) {
           if (table[i].dirty) {
-            write_node(table[i].data, i);
+            this->write_node(table[i].data, i);
             table[i].dirty = false;
           }
         }
@@ -159,7 +159,7 @@ namespace arima_kana {
 
       T &operator[](size_t pos) {
         if (!table[pos].dirty) {
-          read_node(table[pos].data, pos);
+          this->read_node(table[pos].data, pos);
           table[pos].dirty = true;
         }
         return table[pos].data;
@@ -176,6 +176,35 @@ namespace arima_kana {
         }
       }
 
+    };
+
+    template<class T, class pre, size_t num, size_t cap>
+    class Map_Buffer : public Buffer<T, pre, num> {
+      static constexpr int SIZE_T = sizeof(size_t);
+      static constexpr int SIZE_PRE = sizeof(size_t);
+
+      std::map<size_t, T> table;
+
+    public:
+      Map_Buffer(const std::string &fn) : Buffer<T, pre, num>(fn) {}
+
+      T &operator[](size_t pos) {
+        if (table.find(pos) == table.end()) {
+          T tmp;
+          this->read_node(tmp, pos);
+          table[pos] = tmp;
+          if (table.size() > cap) {
+            auto it = table.begin();
+            this->write_node(it->second, it->first);
+            table.erase(it);
+          }
+        }
+        return table[pos];
+      }
+
+      void clear() {
+        table.clear();
+      }
     };
 }
 
