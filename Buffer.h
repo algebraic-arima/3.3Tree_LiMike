@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <map>
 #include "map.h"
 
 namespace arima_kana {
@@ -183,7 +184,7 @@ namespace arima_kana {
       static constexpr int SIZE_T = sizeof(size_t);
       static constexpr int SIZE_PRE = sizeof(size_t);
 
-      map<size_t, size_t> m;
+      std::map<size_t, size_t> m;
       vector<T> table;
       vector<size_t> free_pos;
 
