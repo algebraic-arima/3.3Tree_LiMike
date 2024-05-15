@@ -185,6 +185,7 @@ namespace arima_kana {
 
       map<size_t, size_t> m;
       vector<T> table;
+      vector<size_t> free_pos;
 
     public:
       Map_Buffer(const std::string &fn) :
@@ -195,12 +196,19 @@ namespace arima_kana {
         if (m.find(pos) == m.end()) {
           T tmp;
           this->read_node(tmp, pos);
-          m[pos] = table.size();
-          table.push_back(tmp);
+          if (free_pos.empty()) {
+            m[pos] = table.size();
+            table.push_back(tmp);
+          } else {
+            m[pos] = free_pos.back();
+            table[free_pos.back()] = tmp;
+            free_pos.pop_back();
+          }
           if (m.size() > cap) {
             auto it = m.begin();
             this->write_node(table[it->second], it->first);
             m.erase(it);
+            free_pos.push_back(it->second);
           }
         }
         return table[m[pos]];
