@@ -184,7 +184,7 @@ namespace arima_kana {
       static constexpr int SIZE_T = sizeof(size_t);
       static constexpr int SIZE_PRE = sizeof(size_t);
 
-      std::map<size_t, size_t> m;
+      std::unordered_map<size_t, size_t> m;
       vector<T> table;
       vector<size_t> free_pos;
 
