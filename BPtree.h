@@ -305,7 +305,7 @@ namespace arima_kana {
       size_t free_num = 0;
       std::fstream index_filer;
       std::string index_file;
-      Map_Buffer<Node, size_t, 3, 10000> list;
+      Table_Buffer<Node, size_t, 3> list;
 //      arima_kana::vector<size_t> free_pos;
 
       explicit BPTree(const std::string &ifn) :
@@ -363,20 +363,6 @@ namespace arima_kana {
 //        for (int i = 0; i < free_num; i++) {
 //          index_filer.write(reinterpret_cast<char *>(&free_pos[i]), SIZE_T);
 //        }
-        index_filer.close();
-      }
-
-      void read_node(Node &dn, size_t pos) {
-        index_filer.open(index_file, std::ios::in | std::ios::binary);
-        index_filer.seekg(3 * SIZE_T + (pos - 1) * SIZE_NODE);
-        index_filer.read(reinterpret_cast<char *>(&dn), SIZE_NODE);
-        index_filer.close();
-      }
-
-      void write_node(Node &dn, size_t pos) {
-        index_filer.open(index_file, std::ios::in | std::ios::out | std::ios::binary);
-        index_filer.seekp(3 * SIZE_T + (pos - 1) * SIZE_NODE);
-        index_filer.write(reinterpret_cast<char *>(&dn), SIZE_NODE);
         index_filer.close();
       }
 
