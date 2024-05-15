@@ -44,9 +44,6 @@ namespace arima_kana {
     template<class T, class pre, size_t num, size_t _cap>
     class List_Buffer : public Buffer<T, pre, num> {
 
-      static constexpr int SIZE_T = sizeof(T);
-      static constexpr int SIZE_PRE = sizeof(pre);
-
       struct Node {
         size_t pos;
         T data;
@@ -131,8 +128,6 @@ namespace arima_kana {
 
     template<class T, class pre, size_t num>
     class Table_Buffer : public Buffer<T, pre, num> {
-      static constexpr int SIZE_T = sizeof(T);
-      static constexpr int SIZE_PRE = sizeof(pre);
 
       struct Node {
         T data;
@@ -181,8 +176,6 @@ namespace arima_kana {
 
     template<class T, class pre, size_t num, size_t cap>
     class Map_Buffer : public Buffer<T, pre, num> {
-      static constexpr int SIZE_T = sizeof(size_t);
-      static constexpr int SIZE_PRE = sizeof(size_t);
 
       std::unordered_map<size_t, size_t> m;
       vector<T> table;
