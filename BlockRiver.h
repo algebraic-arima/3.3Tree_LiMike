@@ -21,7 +21,7 @@ namespace arima_kana {
       typedef pair<K, V> KV;
       typedef DataNode<K, V, block> DNode;
       typedef BPTree<K, V, 80, 30> map;
-      typedef List_Map_Buffer<DNode, size_t, 1, 2000> buffer;
+      typedef List_Map_Buffer<DNode, size_t, 1, 1500> buffer;
 
       static constexpr int SIZE_DNODE = sizeof(DNode);
       static constexpr int SIZE_T = sizeof(size_t);
