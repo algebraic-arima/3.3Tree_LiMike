@@ -21,9 +21,11 @@ namespace arima_kana {
         file.close();
       }
 
-      inline void write_node(T &dn, size_t pos) {
+      void write_node(T &dn, size_t pos) {
+        file.open(name, std::ios::in | std::ios::out | std::ios::binary);
         file.seekp(num * SIZE_PRE + (pos - 1) * SIZE_T);
         file.write(reinterpret_cast<char *>(&dn), SIZE_T);
+        file.close();
       }
 
       virtual T &operator[](size_t pos) = 0;
@@ -34,7 +36,7 @@ namespace arima_kana {
       std::fstream file;
       std::string name;
     public:
-      explicit Buffer(const std::string &fn) : name(fn) {}
+      Buffer(const std::string &fn) : name(fn) {}
 
     };
 
@@ -81,7 +83,6 @@ namespace arima_kana {
       ~List_Buffer() {
 //        std::cout << "~Buffer\n";
         Node *tmp = head->next;
-        this->file.open(this->name, std::ios::in | std::ios::out | std::ios::binary);
         while (tmp != tail) {
 //          if (!(tmp->data == tmp->copy))
           this->write_node(tmp->data, tmp->pos);
@@ -89,7 +90,6 @@ namespace arima_kana {
           tmp = tmp->next;
           delete tmp2;
         }
-        this->file.close();
         delete head;
         delete tail;
       }
@@ -119,9 +119,7 @@ namespace arima_kana {
           tmp->prev->next = tail;
           tail->prev = tmp->prev;
 //          if (!(tmp->data == tmp->copy))
-          this->file.open(this->name, std::ios::in | std::ios::out | std::ios::binary);
           this->write_node(tmp->data, tmp->pos);
-          this->file.close();
           delete tmp;
           --_size;
         }
@@ -145,14 +143,12 @@ namespace arima_kana {
       explicit Table_Buffer(const std::string &fn) : table(), Buffer<T, pre, num>(fn) {}
 
       ~Table_Buffer() {
-        this->file.open(this->name, std::ios::in | std::ios::out | std::ios::binary);
         for (size_t i = 0; i < table.size(); ++i) {
           if (table[i].dirty) {
             this->write_node(table[i].data, i);
             table[i].dirty = false;
           }
         }
-        this->file.close();
       }
 
       void clear() {
@@ -206,9 +202,7 @@ namespace arima_kana {
           }
           if (m.size() > cap) {
             auto it = m.begin();
-            this->file.open(this->name, std::ios::in | std::ios::out | std::ios::binary);
             this->write_node(table[it->second], it->first);
-            this->file.close();
             m.erase(it);
             free_pos.push_back(it->second);
           }
@@ -222,11 +216,9 @@ namespace arima_kana {
       }
 
       ~Map_Buffer() {
-        this->file.open(this->name, std::ios::in | std::ios::out | std::ios::binary);
         for (auto &i: m) {
           this->write_node(table[i.second], i.first);
         }
-        this->file.close();
       }
     };
 
@@ -253,12 +245,10 @@ namespace arima_kana {
       }
 
       ~List_Map_Buffer() {
-        this->file.open(this->name, std::ios::in | std::ios::out | std::ios::binary);
         for (auto &i: m) {
           this->write_node(i.second->data, i.first);
           delete i.second;
         }
-        this->file.close();
         delete head;
         delete tail;
       }
