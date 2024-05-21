@@ -21,11 +21,9 @@ namespace arima_kana {
         file.close();
       }
 
-      void write_node(T &dn, size_t pos) {
-        file.open(name, std::ios::in | std::ios::out | std::ios::binary);
+      inline void write_node(T &dn, size_t pos) {
         file.seekp(num * SIZE_PRE + (pos - 1) * SIZE_T);
         file.write(reinterpret_cast<char *>(&dn), SIZE_T);
-        file.close();
       }
 
       virtual T &operator[](size_t pos) = 0;
@@ -36,7 +34,7 @@ namespace arima_kana {
       std::fstream file;
       std::string name;
     public:
-      Buffer(const std::string &fn) : name(fn) {}
+      explicit Buffer(const std::string &fn) : name(fn) {}
 
     };
 
@@ -47,7 +45,7 @@ namespace arima_kana {
       struct Node {
         size_t pos;
         T data;
-        T copy;
+//        T copy;
         Node *next;
         Node *prev;
       };
@@ -56,9 +54,11 @@ namespace arima_kana {
       Node *head;
       Node *tail;
       size_t _size;
+
     public:
 
-      List_Buffer(const std::string &fn) : Buffer<T, pre, num>(fn) {
+      explicit List_Buffer(const std::string &fn) :
+              Buffer<T, pre, num>(fn) {
         head = new Node();
         tail = new Node();
         head->next = tail;
@@ -81,13 +81,15 @@ namespace arima_kana {
       ~List_Buffer() {
 //        std::cout << "~Buffer\n";
         Node *tmp = head->next;
+        this->file.open(this->name, std::ios::in | std::ios::out | std::ios::binary);
         while (tmp != tail) {
-          if (!(tmp->data == tmp->copy))
-            this->write_node(tmp->data, tmp->pos);
+//          if (!(tmp->data == tmp->copy))
+          this->write_node(tmp->data, tmp->pos);
           Node *tmp2 = tmp;
           tmp = tmp->next;
           delete tmp2;
         }
+        this->file.close();
         delete head;
         delete tail;
       }
@@ -106,9 +108,9 @@ namespace arima_kana {
           }
           tmp = tmp->next;
         }
-        Node *new_n = new Node{pos, T(), T(), head->next, head};
+        Node *new_n = new Node{pos, T(), head->next, head};
         this->read_node(new_n->data, pos);
-        new_n->copy = new_n->data;
+//        new_n->copy = new_n->data;
         head->next->prev = new_n;
         head->next = new_n;
         ++_size;
@@ -116,8 +118,10 @@ namespace arima_kana {
           tmp = tail->prev;
           tmp->prev->next = tail;
           tail->prev = tmp->prev;
-          if (!(tmp->data == tmp->copy))
-            this->write_node(tmp->data, tmp->pos);
+//          if (!(tmp->data == tmp->copy))
+          this->file.open(this->name, std::ios::in | std::ios::out | std::ios::binary);
+          this->write_node(tmp->data, tmp->pos);
+          this->file.close();
           delete tmp;
           --_size;
         }
@@ -141,12 +145,14 @@ namespace arima_kana {
       explicit Table_Buffer(const std::string &fn) : table(), Buffer<T, pre, num>(fn) {}
 
       ~Table_Buffer() {
+        this->file.open(this->name, std::ios::in | std::ios::out | std::ios::binary);
         for (size_t i = 0; i < table.size(); ++i) {
           if (table[i].dirty) {
             this->write_node(table[i].data, i);
             table[i].dirty = false;
           }
         }
+        this->file.close();
       }
 
       void clear() {
@@ -182,7 +188,7 @@ namespace arima_kana {
       vector<size_t> free_pos;
 
     public:
-      Map_Buffer(const std::string &fn) :
+      explicit Map_Buffer(const std::string &fn) :
               Buffer<T, pre, num>(fn),
               table() {}
 
@@ -200,7 +206,9 @@ namespace arima_kana {
           }
           if (m.size() > cap) {
             auto it = m.begin();
+            this->file.open(this->name, std::ios::in | std::ios::out | std::ios::binary);
             this->write_node(table[it->second], it->first);
+            this->file.close();
             m.erase(it);
             free_pos.push_back(it->second);
           }
@@ -214,11 +222,50 @@ namespace arima_kana {
       }
 
       ~Map_Buffer() {
+        this->file.open(this->name, std::ios::in | std::ios::out | std::ios::binary);
         for (auto &i: m) {
           this->write_node(table[i.second], i.first);
         }
+        this->file.close();
       }
     };
+
+    template<class T, class pre, size_t num, size_t cap>
+    class List_Map_Buffer : public Buffer<T, pre, num> {
+      struct Node {
+        T data;
+        Node *next;
+        Node *prev;
+      };
+
+      Node *head;
+      Node *tail;
+      size_t _size;
+      std::unordered_map<size_t, Node *> m;
+
+      explicit List_Map_Buffer(const std::string &fn) :
+              Buffer<T, pre, num>(fn),
+              _size(0) {
+        head = new Node();
+        tail = new Node();
+        head->next = tail;
+        tail->prev = head;
+      }
+
+      ~List_Map_Buffer() {
+        this->file.open(this->name, std::ios::in | std::ios::out | std::ios::binary);
+        for (auto &i: m) {
+          this->write_node(i.second->data, i.first);
+          delete i.second;
+        }
+        this->file.close();
+        delete head;
+        delete tail;
+      }
+
+
+    };
+
 }
 
 #endif //BPTREE_BUFFER_H
