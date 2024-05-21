@@ -176,52 +176,6 @@ namespace arima_kana {
 
     };
 
-    template<class T, class pre, size_t num, size_t cap>
-    class Map_Buffer : public Buffer<T, pre, num> {
-
-      std::unordered_map<size_t, size_t> m;
-      vector<T> table;
-      vector<size_t> free_pos;
-
-    public:
-      explicit Map_Buffer(const std::string &fn) :
-              Buffer<T, pre, num>(fn),
-              table() {}
-
-      T &operator[](size_t pos) {
-        if (m.find(pos) == m.end()) {
-          T tmp;
-          this->read_node(tmp, pos);
-          if (free_pos.empty()) {
-            m[pos] = table.size();
-            table.push_back(tmp);
-          } else {
-            m[pos] = free_pos.back();
-            table[free_pos.back()] = tmp;
-            free_pos.pop_back();
-          }
-          if (m.size() > cap) {
-            auto it = m.begin();
-            this->write_node(table[it->second], it->first);
-            m.erase(it);
-            free_pos.push_back(it->second);
-          }
-        }
-        return table[m[pos]];
-      }
-
-      void clear() {
-        table.clear();
-        m.clear();
-      }
-
-      ~Map_Buffer() {
-        for (auto &i: m) {
-          this->write_node(table[i.second], i.first);
-        }
-      }
-    };
-
     template<class T, class pre, size_t num, size_t _cap>
     class List_Map_Buffer : public Buffer<T, pre, num> {
 
