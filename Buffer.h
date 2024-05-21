@@ -265,12 +265,15 @@ namespace arima_kana {
 
       ~List_Map_Buffer() {
         Node *tmp = head->next;
+        this->file.open(this->name, std::ios::in | std::ios::out | std::ios::binary);
         while (tmp != tail) {
-          this->write_node(tmp->data, tmp->pos);
+          this->file.seekp(num * this->SIZE_PRE + (tmp->pos - 1) * this->SIZE_T);
+          this->file.write(reinterpret_cast<char *>(&tmp->data), this->SIZE_T);
           Node *tmp2 = tmp;
           tmp = tmp->next;
           delete tmp2;
         }
+        this->file.close();
         delete head;
         delete tail;
         m.clear();
