@@ -222,37 +222,92 @@ namespace arima_kana {
       }
     };
 
-    template<class T, class pre, size_t num, size_t cap>
+    template<class T, class pre, size_t num, size_t _cap>
     class List_Map_Buffer : public Buffer<T, pre, num> {
+
       struct Node {
+        size_t pos;
         T data;
+//        T copy;
         Node *next;
         Node *prev;
       };
+
 
       Node *head;
       Node *tail;
       size_t _size;
       std::unordered_map<size_t, Node *> m;
 
+    public:
+
       explicit List_Map_Buffer(const std::string &fn) :
-              Buffer<T, pre, num>(fn),
-              _size(0) {
+              Buffer<T, pre, num>(fn) {
         head = new Node();
         tail = new Node();
         head->next = tail;
         tail->prev = head;
+        _size = 0;
+      }
+
+      void clear() {
+        Node *tmp = head->next;
+        while (tmp != tail) {
+          Node *tmp2 = tmp;
+          tmp = tmp->next;
+          delete tmp2;
+        }
+        head->next = tail;
+        tail->prev = head;
+        _size = 0;
+        m.clear();
       }
 
       ~List_Map_Buffer() {
-        for (auto &i: m) {
-          this->write_node(i.second->data, i.first);
-          delete i.second;
+        Node *tmp = head->next;
+        while (tmp != tail) {
+          this->write_node(tmp->data, tmp->pos);
+          Node *tmp2 = tmp;
+          tmp = tmp->next;
+          delete tmp2;
         }
         delete head;
         delete tail;
+        m.clear();
       }
 
+      T &operator[](size_t pos) {
+        auto it = m.find(pos);
+        if (it != m.end()) {
+          Node *tmp = it->second;
+          if (tmp->pos == pos) {
+            tmp->prev->next = tmp->next;
+            tmp->next->prev = tmp->prev;
+            tmp->next = head->next;
+            tmp->prev = head;
+            head->next->prev = tmp;
+            head->next = tmp;
+            return tmp->data;
+          }
+        }
+        Node *new_n = new Node{pos, T(), head->next, head};
+        this->read_node(new_n->data, pos);
+//        new_n->copy = new_n->data;
+        head->next->prev = new_n;
+        head->next = new_n;
+        m.insert({pos, new_n});
+        ++_size;
+        if (_size > _cap) {
+          Node *tmp = tail->prev;
+          tmp->prev->next = tail;
+          tail->prev = tmp->prev;
+          this->write_node(tmp->data, tmp->pos);
+          m.erase(tmp->pos);
+          delete tmp;
+          --_size;
+        }
+        return new_n->data;
+      }
 
     };
 
