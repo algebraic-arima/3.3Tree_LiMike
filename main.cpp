@@ -41,8 +41,8 @@ typedef arima_kana::m_string<69> mstr;
 
 int main() {
   std::ios::sync_with_stdio(false);
-  cin.tie(nullptr);
-  cout.tie(nullptr);
+//  cin.tie(nullptr);
+//  cout.tie(nullptr);
   arima_kana::BlockRiver<mstr, int, 86> bp("fn");
 //  std::set<arima_kana::pair<mstr, int>> mp;
   mstr s;

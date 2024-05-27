@@ -28,7 +28,8 @@ namespace arima_kana {
 //          free_pos.pop_back();
 //          return pos;
 //        }
-        list.push_back(Node());
+//        list.push_back(Node());
+        append_node(Node());
         return ++size;
       }
 
@@ -305,7 +306,7 @@ namespace arima_kana {
       size_t free_num = 0;
       std::fstream index_filer;
       std::string index_file;
-      Table_Buffer<Node, size_t, 3> list;
+      List_Map_Buffer<Node, size_t, 3, 1000> list;
 //      arima_kana::vector<size_t> free_pos;
 
       explicit BPTree(const std::string &ifn) :
@@ -327,7 +328,6 @@ namespace arima_kana {
         index_filer.write(reinterpret_cast<char *>(&size), SIZE_T);
         index_filer.write(reinterpret_cast<char *>(&root), SIZE_T);
         index_filer.write(reinterpret_cast<char *>(&free_num), SIZE_T);
-        list.push_back(Node());
         index_filer.close();
       }
 
@@ -342,12 +342,25 @@ namespace arima_kana {
 //          index_filer.read(reinterpret_cast<char *>(&tmp), SIZE_NODE);
 //          list.push_back(tmp);
 //        }
-        list.resize(size + 1);
+//        list.resize(size + 1);
 //        size_t tm;
 //        for (int i = 0; i < free_num; i++) {
 //          index_filer.read(reinterpret_cast<char *>(&tm), SIZE_T);
 //          free_pos.push_back(tm);
 //        }
+        index_filer.close();
+      }
+
+      void write_node(const Node &n, size_t pos) {
+        index_filer.open(index_file, std::ios::in | std::ios::out | std::ios::binary);
+        index_filer.seekp(SIZE_T * 3 + (pos - 1) * SIZE_NODE);
+        index_filer.write(reinterpret_cast<const char *>(&n), SIZE_NODE);
+        index_filer.close();
+      }
+
+      void append_node(const Node &n) {
+        index_filer.open(index_file, std::ios::app | std::ios::binary);
+        index_filer.write(reinterpret_cast<const char *>(&n), SIZE_NODE);
         index_filer.close();
       }
 
@@ -375,7 +388,7 @@ namespace arima_kana {
           tmp.is_leaf = true;
           root = 1;
           size = 1;
-          list.push_back(tmp);
+          append_node(tmp);
           return;
         }
         auto kv = p(k, v);
