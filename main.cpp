@@ -50,6 +50,7 @@ int main() {
   cin >> n;
   std::string op;
   int val;
+  arima_kana::vector<int> p;
   while (n--) {
     cin >> op;
     if (op == "print") {
@@ -80,7 +81,12 @@ int main() {
 //        std::cout << '\n';
       } else if (op == "find") {
 //        cin >> val;
-        bp.find(s);
+        p.clear();
+        bp.find(s, p);
+        for (int i = 0; i < p.size(); ++i) {
+          std::cout << p[i] << ' ';
+        }
+        std::cout << '\n';
 //        find_key(mp, s);
       } else {
         continue;

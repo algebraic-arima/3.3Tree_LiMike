@@ -147,20 +147,17 @@ namespace arima_kana {
         catch (...) { return; }
       }
 
-      void find(const K &k) {
+      void find(const K &k, vector<V> &v) {
         bool flag = false;
-        arima_kana::vector<size_t> tmp = list.find(k);
+        vector<size_t> tmp = list.find(k);
         for (int i = 0; i < tmp.size(); i++) {
           DNode &t = data_list[tmp[i]];
           for (int j = 0; j < t.size; j++) {
             if (t._data[j].first == k) {
-              std::cout << t._data[j].second << ' ';
-              flag = true;
+              v.push_back(t._data[j].second);
             }
           }
         }
-        if (!flag) std::cout << "null";
-        std::cout << '\n';
       }
 
       void print() {
